@@ -66,6 +66,7 @@
   <ItemGroup>
     <ClCompile Include="AddBkDialog.cpp" />
     <ClCompile Include="BKMWidget.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SaveDialog.cpp" />
     <ClCompile Include="SettingsDialog.cpp" />
@@ -77,6 +78,7 @@
     <ResourceCompile Include="BackupManagerQt64.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="StdStrTool.h" />
     <QtMoc Include="SaveDialog.h" />
     <QtMoc Include="AddBkDialog.h" />

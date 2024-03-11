@@ -12,6 +12,8 @@
 #include <qtimer.h>
 #include <qurl.h>
 #include <algorithm>
+#include <qdebug.h>
+#include "Logger.h"
 
 namespace fs = std::filesystem;
 
@@ -43,6 +45,7 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 {
 	ui->setupUi(this);
+	this->initLogger();
 	this->setFixedSize(585, 440);
 	std::string version = BackupConfig::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
@@ -57,8 +60,6 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::onClick_saveButton);
 	connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::onClick_settingsButton);
 	connect(ui->flushBtn, &QPushButton::clicked, this, &BKMWidget::onClick_flushBtn);
-	connect(ui->moveBtn_up, SIGNAL(clicked()), this, SLOT(onClick_moveButton()));
-	connect(ui->moveBtn_down, SIGNAL(clicked()), this, SLOT(onClick_moveButton()));
 	connect(ui->startButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
 	connect(ui->pauseButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
 	connect(ui->quickBkButton, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
@@ -139,12 +140,18 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 	if (item) {
 		QMenu menu;
 		QMenu* browseMenu = menu.addMenu(tr("ä¯ÀÀÂ·¾¶"));
-		QAction* browseSourceAction = browseMenu->addAction(tr("ä¯ÀÀÔ´ÎÄ¼þÂ·¾¶"));
-		QAction* browseBackupAction = browseMenu->addAction(tr("ä¯ÀÀ´æµµÂ·¾¶"));
+		QAction* browseSourceAction = browseMenu->addAction(tr("Ô´ÎÄ¼þÂ·¾¶"));
+		QAction* browseBackupAction = browseMenu->addAction(tr("´æµµÂ·¾¶"));
 
 		QAction* editAction = menu.addAction(tr("±à¼­"));
-		QAction* removeAction = menu.addAction(tr("ÒÆ³ý"));
-		QAction* deleteAction = menu.addAction(tr("É¾³ý´æµµ"));
+
+		QMenu* deleteMenu = menu.addMenu(tr("ÒÆ³ý"));
+		QAction* removeAction = deleteMenu->addAction(tr("ÒÆ³ý"));
+		QAction* deleteAction = deleteMenu->addAction(tr("É¾³ý"));
+
+		QMenu* moveMenu = menu.addMenu(tr("ÒÆ¶¯"));
+		QAction* moveUpAction = moveMenu->addAction(tr("ÉÏÒÆ"));
+		QAction* moveDownAction = moveMenu->addAction(tr("ÏÂÒÆ"));
 
 		QAction* selectedAction = menu.exec(ui->bkNameList->viewport()->mapToGlobal(pos));
 		if (selectedAction == deleteAction) {
@@ -164,12 +171,30 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 			update_backupNameList();
 		}
 		else if (selectedAction == editAction) {
-			AddBkDialog newDialog(this);
+			AddBkDialog newDialog(this, bkManager.getBackup(index));
 			int res = newDialog.exec();
 			if (res == QDialog::Accepted) {
 				bkManager.editBackup(newDialog.getUserInput(), index);
 			}
 			update_backupNameList();
+		}
+		else if (selectedAction == moveUpAction || selectedAction == moveDownAction) {
+			int index = ui->bkNameList->currentRow();
+			int next_index = -1;
+			if (index == -1) {
+				return;
+			}
+			else if (selectedAction == moveUpAction && index - 1 >= 0) {
+				next_index = index - 1;
+			}
+			else if (selectedAction == moveDownAction && static_cast<unsigned long long>(index) + 1 <= bkManager.getBackupListSize() - 1) {
+				next_index = index + 1;
+			}
+			if (next_index != -1) {
+				bkManager.swapBackups(index, next_index);
+				update_backupNameList();
+				ui->bkNameList->setCurrentRow(next_index);
+			}
 		}
 	}
 }
@@ -204,28 +229,6 @@ void BKMWidget::onClick_flushBtn()
 	update_allBkList();
 	update_backupNameList();
 	update_SPButtonStat();
-}
-
-void BKMWidget::onClick_moveButton()
-{
-	bkManager.resetAutoBackup();
-	QObject* obj = sender();
-	int index = ui->bkNameList->currentRow();
-	int next_index = -1;
-	if (index == -1) {
-		return;
-	}
-	else if (obj == ui->moveBtn_up && index - 1 >= 0) {
-		next_index = index - 1;
-	}
-	else if (obj == ui->moveBtn_down && index + 1 <= bkManager.getBackupListSize() - 1) {
-		next_index = index + 1;
-	}
-	if (next_index != -1) {
-		bkManager.swapBackups(index, next_index);
-		update_backupNameList();
-		ui->bkNameList->setCurrentRow(next_index);
-	}
 }
 
 void BKMWidget::onClick_settingsButton()
@@ -356,6 +359,16 @@ void BKMWidget::onClick_bk_roll_Button()
 	}
 }
 
+void BKMWidget::initLogger()
+{
+	ui->Logger->setReadOnly(true);
+	ui->Logger->setFont(QFont("Consolas", 8));
+	Logger::setGlobalLogger(ui->Logger);
+	Logger::setDefaultLogger();
+	qDebug() << "Logger successfully set";
+
+}
+
 void BKMWidget::setBtnIcon()
 {
 	ui->pauseButton->setIcon(QIcon("resources//redsquare.png"));
@@ -364,10 +377,12 @@ void BKMWidget::setBtnIcon()
 	ui->pauseButton->setIconSize(QSize(60, 60));
 	ui->myPicture->setIcon(QIcon("resources//wha.png"));
 	ui->myPicture->setIconSize(QSize(121, 121));
+	/*
 	ui->moveBtn_down->setIcon(QIcon("resources//black_arrow2.png"));
 	ui->moveBtn_down->setIconSize(QSize(25, 25));
 	ui->moveBtn_up->setIcon(QIcon("resources//black_arrow1.png"));
 	ui->moveBtn_up->setIconSize(QSize(25, 25));
+	*/
 	ui->settingsBtn->setIcon(QIcon("resources//settings.png"));
 	ui->settingsBtn->setIconSize(QSize(26, 26));
 }
@@ -416,6 +431,7 @@ void BKMWidget::showMessage(const QString& message)
 	riseAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 	opacityAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 	//QTimer::singleShot(1200, msg, &QLabel::deleteLater);
+	//Logger::append(message);
 }
 
 void BKMWidget::update_SPButtonStat()

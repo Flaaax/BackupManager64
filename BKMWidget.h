@@ -6,10 +6,11 @@
 #include <QPropertyAnimation>
 #include <QtWidgets/QWidget>
 
-//todo 实现一个日志系统
+//todo 优化右键菜单，添加属性栏目
+//todo 为其它操作添加logger
+//主界面
 class BKMWidget : public QWidget
 {
-	//带界面的BackupManager
 	Q_OBJECT
 public:
 	BKMWidget(QWidget* parent = nullptr);
@@ -19,7 +20,6 @@ private slots:
 	void onClick_addBkButton();
 	void onClick_saveButton();
 	void onClick_SPButton();								//start and pause button
-	void onClick_moveButton();
 	void onClick_settingsButton();
 	void onClick_bk_roll_Button();
 	void onChange_bkNameList(QListWidgetItem* item);		//更新namelist和currentBackup
@@ -28,6 +28,7 @@ private slots:
 	void onClick_flushBtn();
 
 private:
+	void initLogger();
 	void setBtnIcon();
 	void update_backupNameList();
 	void showMessage(const QString& message);

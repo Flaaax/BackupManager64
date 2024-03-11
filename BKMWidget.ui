@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>BackupManager V1.0</string>
+   <string>BackupManagerWindow</string>
   </property>
   <property name="toolTip">
    <string notr="true"/>
@@ -49,8 +49,8 @@
   <widget class="QPushButton" name="pauseButton">
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>334</y>
+     <x>493</x>
+     <y>330</y>
      <width>60</width>
      <height>60</height>
     </rect>
@@ -178,44 +178,6 @@
     <string>保存设置</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="moveBtn_up">
-   <property name="geometry">
-    <rect>
-     <x>169</x>
-     <y>104</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>25</width>
-     <height>25</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="moveBtn_down">
-   <property name="geometry">
-    <rect>
-     <x>169</x>
-     <y>136</y>
-     <width>25</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>25</width>
-     <height>25</height>
-    </size>
-   </property>
-  </widget>
   <widget class="QPushButton" name="settingsBtn">
    <property name="geometry">
     <rect>
@@ -254,8 +216,8 @@
   <widget class="QPushButton" name="myPicture">
    <property name="geometry">
     <rect>
-     <x>437</x>
-     <y>73</y>
+     <x>165</x>
+     <y>72</y>
      <width>121</width>
      <height>121</height>
     </rect>
@@ -334,6 +296,16 @@
    </property>
    <property name="text">
     <string>L</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="Logger">
+   <property name="geometry">
+    <rect>
+     <x>288</x>
+     <y>72</y>
+     <width>265</width>
+     <height>121</height>
+    </rect>
    </property>
   </widget>
  </widget>
