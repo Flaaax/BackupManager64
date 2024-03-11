@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BKMWidgetClass</class>
+ <widget class="QWidget" name="BKMWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>585</width>
+    <height>440</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Constantia</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>BackupManager V1.0</string>
+  </property>
+  <property name="toolTip">
+   <string notr="true"/>
+  </property>
+  <widget class="QPushButton" name="startButton">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>334</y>
+     <width>60</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>启用自动保存</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
+   </property>
+   <property name="text">
+    <string extracomment="start autobackup"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>60</width>
+     <height>60</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pauseButton">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>334</y>
+     <width>60</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>停止自动保存</string>
+   </property>
+   <property name="text">
+    <string extracomment="pause autobackup"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>60</width>
+     <height>60</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="bkNameList">
+   <property name="geometry">
+    <rect>
+     <x>32</x>
+     <y>72</y>
+     <width>131</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="dragEnabled">
+    <bool>false</bool>
+   </property>
+   <property name="dragDropMode">
+    <enum>QAbstractItemView::NoDragDrop</enum>
+   </property>
+   <property name="defaultDropAction">
+    <enum>Qt::CopyAction</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectItems</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="quickBkButton">
+   <property name="geometry">
+    <rect>
+     <x>401</x>
+     <y>276</y>
+     <width>103</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Quick Save</string>
+   </property>
+   <property name="text">
+    <string extracomment="quick backup">QS</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addBkButton">
+   <property name="geometry">
+    <rect>
+     <x>33</x>
+     <y>30</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>add a new file path</string>
+   </property>
+   <property name="text">
+    <string>+新存档</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="quickRollbackBtn">
+   <property name="geometry">
+    <rect>
+     <x>401</x>
+     <y>223</y>
+     <width>103</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Quick Load</string>
+   </property>
+   <property name="text">
+    <string extracomment="quick rollback">QL</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveButton">
+   <property name="geometry">
+    <rect>
+     <x>153</x>
+     <y>30</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>save configs</string>
+   </property>
+   <property name="text">
+    <string>保存设置</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="moveBtn_up">
+   <property name="geometry">
+    <rect>
+     <x>169</x>
+     <y>104</y>
+     <width>25</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>25</width>
+     <height>25</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="moveBtn_down">
+   <property name="geometry">
+    <rect>
+     <x>169</x>
+     <y>136</y>
+     <width>25</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>25</width>
+     <height>25</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settingsBtn">
+   <property name="geometry">
+    <rect>
+     <x>353</x>
+     <y>223</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>settings</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>26</width>
+     <height>26</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="allBkList">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>215</y>
+     <width>311</width>
+     <height>191</height>
+    </rect>
+   </property>
+   <property name="defaultDropAction">
+    <enum>Qt::CopyAction</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="myPicture">
+   <property name="geometry">
+    <rect>
+     <x>437</x>
+     <y>73</y>
+     <width>121</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>121</width>
+     <height>121</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="flushBtn">
+   <property name="geometry">
+    <rect>
+     <x>354</x>
+     <y>275</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>settings</string>
+   </property>
+   <property name="text">
+    <string>Flush</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>26</width>
+     <height>26</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="saveBtn">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>276</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Save</string>
+   </property>
+   <property name="text">
+    <string>S</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="loadBtn">
+   <property name="geometry">
+    <rect>
+     <x>510</x>
+     <y>224</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Load</string>
+   </property>
+   <property name="text">
+    <string>L</string>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="BackupManagerQt64.qrc"/>
+ </resources>
+ <connections/>
+</ui>

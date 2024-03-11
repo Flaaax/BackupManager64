@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsDialogClass</class>
+ <widget class="QDialog" name="SettingsDialogClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>358</width>
+    <height>255</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>5</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>设置</string>
+  </property>
+  <widget class="QPushButton" name="okButton">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>181</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>确认</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="rejectButton">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>181</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>手滑了</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="autobkPeriodEd">
+   <property name="geometry">
+    <rect>
+     <x>93</x>
+     <y>118</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>30</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="autobkEnableBtn">
+   <property name="geometry">
+    <rect>
+     <x>92</x>
+     <y>40</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>打开时启用自动保存</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>92</x>
+     <y>86</y>
+     <width>201</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>自动保存间隔</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>209</x>
+     <y>118</y>
+     <width>72</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>微软雅黑 Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>分钟</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
