@@ -2,6 +2,7 @@
 #include <string>
 #include <locale>
 #include <codecvt>
+#include <qstring.h>
 
 class StdStrTool
 {
@@ -17,13 +18,13 @@ public:
 		return std::u8string(reinterpret_cast<const char8_t*>(s.data()), s.size());
 	}
 
-	static std::string toString(const std::wstring& s)
+	static std::string toStdString(const std::wstring& s)
 	{
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
 		return myconv.to_bytes(s);
 	}
 
-	static std::string toString(const std::u8string& s)
+	static std::string toStdString(const std::u8string& s)
 	{
 		return std::string(reinterpret_cast<const char*>(s.data()), s.size());
 	}

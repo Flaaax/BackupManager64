@@ -63,7 +63,7 @@ BackupItem AddBkDialog::getUserInput() const
 		// 使用.toStdWString()确保路径字符串是宽字符格式
 		std::filesystem::path(ui->sourcePathEdit->text().toStdWString()),
 		std::filesystem::path(ui->backupPathEdit->text().toStdWString()),
-		// 如果备份名不是路径，可以使用.toString()，否则也应使用.toStdWString()
+		// 如果备份名不是路径，可以使用.toStdString()，否则也应使用.toStdWString()
 		ui->backupNameEdit->text().toStdWString()
 	};
 	return newItem;

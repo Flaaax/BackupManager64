@@ -63,6 +63,9 @@
     <ClCompile Include="BackupManager\BackupConfig.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackupManager\BackupManagerQt.h">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="BackupManager\BackupConfig.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

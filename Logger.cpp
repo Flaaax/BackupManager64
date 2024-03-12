@@ -1,5 +1,6 @@
 #include "Logger.h"
 #include "BackupManager/BackupConfig.h"
+#include "StdStrTool.h"
 
 QPlainTextEdit* Logger::logger = NULL;
 std::mutex Logger::loggerMtx;
@@ -61,4 +62,35 @@ void Logger::customMessageHandler(QtMsgType type, const QMessageLogContext& cont
 void Logger::setDefaultLogger()
 {
 	qInstallMessageHandler(Logger::customMessageHandler);
+}
+
+void Logger::log(const QString& msg, LogType type)
+{
+	switch (type) {
+		case LogType::LOG:
+			Logger::append(msg);
+			break;
+		case LogType::DEBUG:
+			Logger::append("Debug: " + msg);
+			break;
+		case LogType::CRITICAL:
+			Logger::append("Critical: " + msg);
+			break;
+		case LogType::INFO:
+			Logger::append("Info: " + msg);
+			break;
+		case LogType::WARNING:
+			Logger::append("Warning: " + msg);
+			break;
+		case LogType::FATAL:
+			Logger::append("FATAL: " + msg);
+			std::abort();			//program abort
+			break;
+		case LogType::ERR:
+			Logger::append("ERROR: " + msg);
+			throw std::runtime_error(msg.toStdString());
+			break;
+		default:
+			Logger::append("Unkown: " + msg);
+	}
 }
