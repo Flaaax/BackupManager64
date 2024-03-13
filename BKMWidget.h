@@ -5,11 +5,13 @@
 #include "ui_BKMWidget.h"
 #include <QPropertyAnimation>
 #include <QtWidgets/QWidget>
+#include <qmutex>
 
 //todo 优化右键菜单，添加属性栏目
 //todo 将ThreadPool嵌入BackupManagerQt类
 //todo 给ThreadPool添加异常处理
 //todo 添加更多配置
+//todo 捕获线程池中的异常
 //主界面
 class BKMWidget : public QWidget
 {
@@ -28,6 +30,7 @@ private slots:
 	void showMenu_bkNameList(const QPoint& pos);
 	void showMenu_allBkList(const QPoint& pos);
 	void onClick_flushBtn();
+	void updateAll();
 
 private:
 	void initLogger();
@@ -42,6 +45,8 @@ private:
 	BackupManagerQt bkManager;								//包含构造函数
 	Ui::BKMWidgetClass* ui = new Ui::BKMWidgetClass;
 	qint64 lastClickTime = 0;
+	QMutex updateMtx;
+
 };
 
 

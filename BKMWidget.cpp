@@ -15,6 +15,23 @@
 #include <qdebug.h>
 #include "Logger.h"
 
+static void myFileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+	QFile file("log.txt");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+		// 如果文件无法打开，则输出到标准错误输出
+		QTextStream(stderr) << "Cannot open log file: " << file.errorString();
+		return;
+	}
+
+	QTextStream out(&file);
+	out << msg << "\n"; // 将消息追加到文件中
+	file.flush();  // 确保消息立即写入文件
+
+	// 如果需要，也可以将消息输出到标准输出
+	QTextStream(stderr) << msg << "\n";
+}
+
 namespace fs = std::filesystem;
 
 static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
@@ -45,7 +62,9 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 {
 	ui->setupUi(this);
+	this->bkManager.setGeneralCallback([this](bool stat) {this->update_allBkList(); });
 	this->initLogger();
+	qInstallMessageHandler(myFileLogger);
 	this->setFixedSize(585, 440);
 	std::string version = BackupConfig::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
@@ -77,6 +96,8 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	//QTimer* timer = new QTimer(this);
 	//connect(timer, &QTimer::timeout, this, [this]() {update_allBkList(); });
 	//timer->start(30000);	//每5min更新一次存档列表
+	//QMessageBox::critical(nullptr, "Exception Caught", "BKMWidget init");
+
 }
 
 void BKMWidget::onClick_addBkButton()
@@ -98,7 +119,7 @@ void BKMWidget::onClick_saveButton()
 void BKMWidget::onClick_SPButton()
 {
 	QObject* obj = sender();
-	time_t bktime = bkManager.getAutobackupTimer();
+	time_t bktime = bkManager.getAutoBackupTimer();
 	if (obj == ui->startButton) {
 		bkManager.resumeAutoBackup();
 		showMessage(QString("自动存档：启用 time=") + QString::number(bktime));
@@ -230,6 +251,15 @@ void BKMWidget::onClick_flushBtn()
 	update_SPButtonStat();
 }
 
+void BKMWidget::updateAll()
+{
+	//this->updateMtx.lock();
+	update_allBkList();
+	update_backupNameList();
+	update_SPButtonStat();
+	//this->updateMtx.unlock();
+}
+
 void BKMWidget::onClick_settingsButton()
 {
 	SettingsDialog newDialog(this, bkManager.getConfigs());
@@ -262,30 +292,13 @@ void BKMWidget::onClick_bk_roll_Button()
 		return;
 	}
 	if (obj == ui->quickBkButton) {
-		bkManager.createBackup();
-		if (bkManager.goodStatus()) {
-			showMessage("存档成功");
-		}
-		else {
-			showMessage("存档失败！");
-		}
-		update_allBkList();
+		bkManager.createBackup(L"", false);
 		lastClickTime = now;
 	}
 	else if (obj == ui->quickRollbackBtn) {
-		auto backups = bkManager.getAllBackups();
-		if (backups.empty()) {
-			showMessage("失败：没有存档");
-			return;
-		}
+		showMessage("快速回档中");
 		//todo 加入回档确认选项
-		bkManager.rollback(backups[0].first);
-		if (bkManager.goodStatus()) {
-			showMessage("回档成功");
-		}
-		else {
-			showMessage("回档失败！");
-		}
+		bkManager.rollBack(0);
 	}
 	else if (obj == ui->saveBtn) {
 		SaveDialog dialog(this);
@@ -323,14 +336,13 @@ void BKMWidget::onClick_bk_roll_Button()
 
 	}
 	else if (obj == ui->loadBtn) {
-		BackupManagerQt::folders backups = bkManager.getAllBackups();
+		auto backups = bkManager.getAllBackups();
 		if (backups.empty()) {
 			showMessage("失败：没有存档");
 			return;
 		}
 		int index = ui->allBkList->currentRow();
 		//todo 加入回档确认选项
-		showMessage("快速回档中");
 		if (index == -1)index = 0;
 		if (index >= 0 && index <= backups.size() - 1) {
 			QString name = QString::fromStdWString(backups[index].first.filename().wstring());
@@ -341,14 +353,7 @@ void BKMWidget::onClick_bk_roll_Button()
 			msg.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 			int res = msg.exec();
 			if (res == QMessageBox::Ok) {
-				bkManager.rollback(backups[index].first);
-				if (bkManager.goodStatus()) {
-					showMessage("回档成功");
-				}
-				else {
-					showMessage("回档失败！");
-				}
-				update_allBkList();
+				bkManager.rollBack(index);
 				lastClickTime = now;
 			}
 		}
@@ -435,7 +440,7 @@ void BKMWidget::showMessage(const QString& message)
 
 void BKMWidget::update_SPButtonStat()
 {
-	bool isRunning = bkManager.isAutobkRunning();
+	bool isRunning = bkManager.isAutoBackupRunning();
 	ui->startButton->setEnabled(!isRunning);
 	ui->pauseButton->setEnabled(isRunning);
 }
@@ -458,7 +463,7 @@ void BKMWidget::update_allBkList()
 		}
 	}
 	else {
-		QListWidgetItem* item = new QListWidgetItem("空", ui->allBkList);
+		QListWidgetItem* item = new QListWidgetItem("空列表", ui->allBkList);
 	}
 	ui->allBkList->blockSignals(false);
 }

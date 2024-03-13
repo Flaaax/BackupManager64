@@ -34,7 +34,7 @@ public:
 	static void critical(const QString& msg);
 
 private:
-	static void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg);
+	static void myFileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 	static QPlainTextEdit* logger;
 	static std::mutex loggerMtx;
 };

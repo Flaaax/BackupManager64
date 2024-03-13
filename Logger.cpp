@@ -1,6 +1,7 @@
 #include "Logger.h"
 #include "BackupManager/BackupConfig.h"
 #include "StdStrTool.h"
+#include <QMessageBox>
 
 QPlainTextEdit* Logger::logger = NULL;
 std::mutex Logger::loggerMtx;
@@ -42,7 +43,7 @@ void Logger::debug(const QString& msg)
 {
 }
 
-void Logger::customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+void Logger::myFileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	QByteArray localMsg = msg.toLocal8Bit();
 	switch (type) {
@@ -91,7 +92,7 @@ void Logger::err(const QString& msg)
 
 void Logger::setDefaultLogger()
 {
-	qInstallMessageHandler(Logger::customMessageHandler);
+	qInstallMessageHandler(Logger::myFileLogger);
 }
 
 void Logger::log(const QString& msg, LogType type)

@@ -1,5 +1,6 @@
 #include "ThreadPool.h"
 #include "Logger.h"
+#include <QMessageBox>
 
 ThreadPool::ThreadPool(size_t threads)
 {

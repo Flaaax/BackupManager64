@@ -6,8 +6,8 @@
     },
     "BackupList": [
         {
-            "backup_name": "中文名称",
             "backup_path": "E:/testfolder/case_backupfolder",
+            "name": "dddd啊",
             "source_path": "E:/testfolder/case_folder/case_save"
         }
     ],
