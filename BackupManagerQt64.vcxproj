@@ -82,6 +82,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="StdStrTool.h" />
     <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="VectorTool.h" />
     <QtMoc Include="SaveDialog.h" />
     <QtMoc Include="AddBkDialog.h" />
     <ClInclude Include="BackupManager\BackupConfig.h" />

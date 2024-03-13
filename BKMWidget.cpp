@@ -187,7 +187,7 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 			else if (selectedAction == moveUpAction && index - 1 >= 0) {
 				next_index = index - 1;
 			}
-			else if (selectedAction == moveDownAction && static_cast<unsigned long long>(index) + 1 <= bkManager.getBackupListSize() - 1) {
+			else if (selectedAction == moveDownAction && static_cast<unsigned long long>(index) + 1 <= bkManager.getSize() - 1) {
 				next_index = index + 1;
 			}
 			if (next_index != -1) {
@@ -203,16 +203,14 @@ void BKMWidget::showMenu_allBkList(const QPoint& pos)
 {
 	QListWidgetItem* item = ui->allBkList->itemAt(pos);
 	int index = ui->allBkList->row(item);
-	auto backups = bkManager.getAllBackups();
-	if (index >= 0 && index <= backups.size() - 1) {
-		const auto& path = backups[index].first;
+	if (index >= 0 && index <= bkManager.getSize() - 1) {
 		QMenu menu;
 		QAction* copyAction = menu.addAction(tr("复制"));
 		QAction* deleteAction = menu.addAction(tr("删除"));
 		QAction* browseAction = menu.addAction(tr("查看路径"));
 		QAction* selectedAction = menu.exec(ui->allBkList->viewport()->mapToGlobal(pos));
 		if (selectedAction == copyAction) {
-			bkManager.copyBackup(path);
+			bkManager.copyBackup(index);
 		}
 		else if (selectedAction == deleteAction) {
 			bkManager.deleteBackup(path);
@@ -236,7 +234,7 @@ void BKMWidget::onClick_settingsButton()
 	SettingsDialog newDialog(this, bkManager.getConfigs());
 	int res = newDialog.exec();
 	if (res == QDialog::Accepted) {
-		bkManager.setConfigs(newDialog.getUserInput());
+		bkManager.updateConfigs(newDialog.getUserInput());
 		showMessage("保存成功");
 	}
 }
@@ -392,8 +390,8 @@ void BKMWidget::update_backupNameList()
 	//bkConfigs.currentItem = ui->bkNameList->currentRow();
 	ui->bkNameList->blockSignals(true);
 	ui->bkNameList->clear();
-	for (int index = 0; index < bkManager.getBackupListSize(); index++) {
-		QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackup(index).backup_name), ui->bkNameList);
+	for (int index = 0; index < bkManager.getSize(); index++) {
+		QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackup(index).name), ui->bkNameList);
 		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 		if (index == bkManager.getConfigs().currentItem) {
 			item->setCheckState(Qt::Checked);
@@ -447,7 +445,7 @@ void BKMWidget::update_allBkList()
 	ui->allBkList->clear();
 	auto backups = bkManager.getAllBackups();
 	//int currentItem = bkManager.getConfigs().currentItem;
-	//QString name = QString::fromStdString(bkManager.getBackup(currentItem).backup_name);
+	//QString name = QString::fromStdString(bkManager.getBackup(currentItem).name);
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
 			QListWidgetItem* item = new QListWidgetItem(ui->allBkList);
@@ -469,7 +467,7 @@ bool BKMWidget::check_backupValid()
 	if (bkManager.isBackupValid(BackupManagerQt::ALL)) {
 		QMessageBox msg(this);
 		msg.setWindowTitle("错误");
-		QString text = "存档 " + QString::fromStdWString(bkManager.getBackup().backup_name) + " 找不到路径，\n或者路径被修改";
+		QString text = "存档 " + QString::fromStdWString(bkManager.getBackup().name) + " 找不到路径，\n或者路径被修改";
 		msg.setText(text);
 		QPushButton* btn = msg.addButton(tr("确定"), QMessageBox::AcceptRole);
 		msg.exec();

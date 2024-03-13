@@ -4,6 +4,7 @@
 
 QPlainTextEdit* Logger::logger = NULL;
 std::mutex Logger::loggerMtx;
+bool Logger::debugMode = true;
 
 void Logger::setGlobalLogger(QPlainTextEdit* newLogger)
 {
@@ -42,7 +43,7 @@ void Logger::customMessageHandler(QtMsgType type, const QMessageLogContext& cont
 	QByteArray localMsg = msg.toLocal8Bit();
 	switch (type) {
 		case QtDebugMsg:
-			Logger::append(QString("Debug: %1").arg(msg));
+			if (Logger::debugMode)Logger::append(QString("Debug: %1").arg(msg));
 			break;
 		case QtInfoMsg:
 			Logger::append(QString("Info: %1").arg(msg));
@@ -71,7 +72,7 @@ void Logger::log(const QString& msg, LogType type)
 			Logger::append(msg);
 			break;
 		case LogType::DEBUG:
-			Logger::append("Debug: " + msg);
+			if (Logger::debugMode)Logger::append("Debug: " + msg);
 			break;
 		case LogType::CRITICAL:
 			Logger::append("Critical: " + msg);

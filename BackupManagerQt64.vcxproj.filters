@@ -39,9 +39,6 @@
     <ClCompile Include="BackupManager\BackupManagerQt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BackupManager\BackupProcess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BKMWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,12 +63,12 @@
     <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="BackupManager\BackupProcess.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackupManager\BackupManagerQt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BackupManager\BackupProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StdStrTool.h">
@@ -84,6 +81,12 @@
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="ThreadPool.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupManager\BackupProcess.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorTool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,7 +7,9 @@
 #include <QtWidgets/QWidget>
 
 //todo 优化右键菜单，添加属性栏目
-//todo 为其它操作添加logger
+//todo 将ThreadPool嵌入BackupManagerQt类
+//todo 给ThreadPool添加异常处理
+//todo 添加更多配置
 //主界面
 class BKMWidget : public QWidget
 {

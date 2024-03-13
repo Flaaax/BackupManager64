@@ -43,7 +43,7 @@ AddBkDialog::AddBkDialog(QWidget* parent, BackupItem item)
 	}
 	else {
 		this->setWindowTitle("±à¼­´æµµ");
-		ui->backupNameEdit->setText(QString::fromStdWString(item.backup_name));
+		ui->backupNameEdit->setText(QString::fromStdWString(item.name));
 		ui->backupPathEdit->setText(QString::fromStdWString(item.backup_path.wstring()));
 		ui->sourcePathEdit->setText(QString::fromStdWString(item.source_path.wstring()));
 	}

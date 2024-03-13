@@ -208,7 +208,7 @@
     </font>
    </property>
    <property name="text">
-    <string>不确认</string>
+    <string>取消</string>
    </property>
   </widget>
   <widget class="QLabel" name="bkNameValid_label">
