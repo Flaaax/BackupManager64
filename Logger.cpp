@@ -38,6 +38,10 @@ void Logger::append(const char* msg)
 	Logger::append(QString::fromUtf8(msg));
 }
 
+void Logger::debug(const QString& msg)
+{
+}
+
 void Logger::customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	QByteArray localMsg = msg.toLocal8Bit();
@@ -58,6 +62,31 @@ void Logger::customMessageHandler(QtMsgType type, const QMessageLogContext& cont
 			Logger::append(QString("Fatal: %1").arg(msg));
 			abort();
 	}
+}
+
+void Logger::warning(const QString& msg)
+{
+	Logger::log(msg, Logger::WARNING);
+}
+
+void Logger::fatal(const QString& msg)
+{
+	Logger::log(msg, Logger::FATAL);
+}
+
+void Logger::info(const QString& msg)
+{
+	Logger::log(msg, Logger::INFO);
+}
+
+void Logger::critical(const QString& msg)
+{
+	Logger::log(msg, Logger::CRITICAL);
+}
+
+void Logger::err(const QString& msg)
+{
+	Logger::log(msg, Logger::ERR);
 }
 
 void Logger::setDefaultLogger()

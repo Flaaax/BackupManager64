@@ -125,10 +125,10 @@ void BKMWidget::onChange_bkNameList(QListWidgetItem* item)
 				checkedItemPos = i;
 			}
 		}
-		bkManager.setCurrentBackup(checkedItemPos);
+		bkManager.setBackup(checkedItemPos);
 	}
 	else {
-		bkManager.setCurrentBackup(-1);
+		bkManager.setBackup(-1);
 	}
 	ui->bkNameList->blockSignals(false);
 }
@@ -213,9 +213,10 @@ void BKMWidget::showMenu_allBkList(const QPoint& pos)
 			bkManager.copyBackup(index);
 		}
 		else if (selectedAction == deleteAction) {
-			bkManager.deleteBackup(path);
+			bkManager.deleteBackup(index);
 		}
 		else if (selectedAction == browseAction) {
+			const auto& path = bkManager.getAllBackups()[index].first;
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(path.wstring())));
 		}
 		update_allBkList();
@@ -272,7 +273,7 @@ void BKMWidget::onClick_bk_roll_Button()
 		lastClickTime = now;
 	}
 	else if (obj == ui->quickRollbackBtn) {
-		BackupManagerQt::folders backups = bkManager.getAllBackups();
+		auto backups = bkManager.getAllBackups();
 		if (backups.empty()) {
 			showMessage("Ê§°Ü£ºÃ»ÓÐ´æµµ");
 			return;

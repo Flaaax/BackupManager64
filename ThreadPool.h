@@ -21,5 +21,5 @@ private:
 public:
 	ThreadPool(size_t threads);
 	~ThreadPool();
-	void enqueue(std::function<void()>& task);
+	void enqueue(std::function<void()>&& task);
 };

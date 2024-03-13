@@ -14,7 +14,13 @@ ThreadPool::ThreadPool(size_t threads)
 					if (this->stop && this->tasks.empty())return;
 					task = std::move(tasks.front());
 				}
-				task();
+				try {
+					task();
+				}
+				catch (const std::exception& e) {
+					Logger::warning("Thread exception:");
+					Logger::warning(e.what());
+				}
 			}
 		});
 	}
@@ -32,7 +38,7 @@ ThreadPool::~ThreadPool()
 	}
 }
 
-void ThreadPool::enqueue(std::function<void()>& task)
+void ThreadPool::enqueue(std::function<void()>&& task)
 {
 	{
 		std::unique_lock<std::mutex> lock(this->queueMtx);
@@ -40,7 +46,7 @@ void ThreadPool::enqueue(std::function<void()>& task)
 			Logger::log("Enqueue stopped ThreadPool.", Logger::WARNING);
 			return;
 		}
-		tasks.emplace(task);
+		tasks.emplace(std::move(task));
 	}
 	this->cv.notify_one();
 }

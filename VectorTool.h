@@ -6,13 +6,13 @@ class VectorTool
 public:
 
 	template<class T>
-	static bool isValid(const std::vector<T>& vec, int index)
+	static bool isValid(const std::vector<T>& vec, int index) noexcept
 	{
 		return !vec.empty() && index >= 0 && index <= vec.size();
 	}
 
 	template<class T>
-	static T* safeGet(const std::vector<T>& vec, int index)
+	static T* safeGet(const std::vector<T>& vec, int index) noexcept
 	{
 		if (isValid(vec, index){
 			return const_cast<T*>(&vector[index]);

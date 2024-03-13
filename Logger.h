@@ -26,6 +26,12 @@ public:
 	static void setDefaultLogger();
 
 	static void log(const QString& msg, LogType type = LOG);
+	static void debug(const QString& msg);
+	static void warning(const QString& msg);
+	static void err(const QString& msg);
+	static void fatal(const QString& msg);
+	static void info(const QString& msg);
+	static void critical(const QString& msg);
 
 private:
 	static void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg);
