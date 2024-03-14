@@ -74,9 +74,6 @@
     <ClInclude Include="StdStrTool.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="BackupManager\BackupConfig.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
@@ -102,6 +99,9 @@
     </QtMoc>
     <QtMoc Include="SaveDialog.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Logger.h">
+      <Filter>Header Files\Utils</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

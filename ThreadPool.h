@@ -9,6 +9,7 @@
 #include<stdexcept>
 #include<type_traits>
 
+//this class is deprecated, use QThreadpool instead
 class ThreadPool
 {
 private:

@@ -8,7 +8,7 @@ public:
 	template<class T>
 	static bool isValid(const std::vector<T>& vec, int index) noexcept
 	{
-		return !vec.empty() && index >= 0 && index <= vec.size()-1;
+		return (!vec.empty()) && index >= 0 && index <= vec.size()-1;
 	}
 
 	template<class T>

@@ -1,36 +1,21 @@
 #pragma execution_character_set("utf-8")
 #include "AddBkDialog.h"
 #include "BKMWidget.h"
-#include "SettingsDialog.h"
+#include "Logger.h"
 #include "SaveDialog.h"
+#include "SettingsDialog.h"
+#include "VectorTool.h"
+#include <algorithm>
 #include <qboxlayout.h>
 #include <qdatetime.h>
+#include <qdebug.h>
 #include <qdesktopservices.h>
 #include <qgraphicseffect.h>
 #include <qmenu.h>
 #include <QMessageBox>
+#include <qtextdocument.h>
 #include <qtimer.h>
 #include <qurl.h>
-#include <algorithm>
-#include <qdebug.h>
-#include "Logger.h"
-
-static void myFileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-	QFile file("log.txt");
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-		// 如果文件无法打开，则输出到标准错误输出
-		QTextStream(stderr) << "Cannot open log file: " << file.errorString();
-		return;
-	}
-
-	QTextStream out(&file);
-	out << msg << "\n"; // 将消息追加到文件中
-	file.flush();  // 确保消息立即写入文件
-
-	// 如果需要，也可以将消息输出到标准输出
-	QTextStream(stderr) << msg << "\n";
-}
 
 namespace fs = std::filesystem;
 
@@ -62,9 +47,8 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 {
 	ui->setupUi(this);
-	this->bkManager.setGeneralCallback([this](bool stat) {this->update_allBkList(); });
+	this->bkManager.setGeneralCallback([this](bool stat) {Logger::instance().update(stat); });
 	this->initLogger();
-	qInstallMessageHandler(myFileLogger);
 	this->setFixedSize(585, 440);
 	std::string version = BackupConfig::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
@@ -78,7 +62,7 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	connect(ui->addBkButton, &QPushButton::clicked, this, &BKMWidget::onClick_addBkButton);
 	connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::onClick_saveButton);
 	connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::onClick_settingsButton);
-	connect(ui->flushBtn, &QPushButton::clicked, this, &BKMWidget::onClick_flushBtn);
+	connect(ui->flushBtn, &QPushButton::clicked, this, &BKMWidget::updateAll);
 	connect(ui->startButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
 	connect(ui->pauseButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
 	connect(ui->quickBkButton, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
@@ -187,7 +171,7 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 			QDesktopServices::openUrl(QUrl::fromLocalFile(backupPath));
 		}
 		else if (selectedAction == removeAction) {
-			bkManager.removeBackup(index, false);
+			bkManager.removeBackupItem(index, false);
 			bkManager.saveAll();
 			update_backupNameList();
 		}
@@ -224,7 +208,8 @@ void BKMWidget::showMenu_allBkList(const QPoint& pos)
 {
 	QListWidgetItem* item = ui->allBkList->itemAt(pos);
 	int index = ui->allBkList->row(item);
-	if (index >= 0 && index <= bkManager.getSize() - 1) {
+	auto backupFiles = bkManager.getAllBackups();
+	if (VectorTool::isValid(backupFiles, index)) {
 		QMenu menu;
 		QAction* copyAction = menu.addAction(tr("复制"));
 		QAction* deleteAction = menu.addAction(tr("删除"));
@@ -237,27 +222,22 @@ void BKMWidget::showMenu_allBkList(const QPoint& pos)
 			bkManager.deleteBackup(index);
 		}
 		else if (selectedAction == browseAction) {
-			const auto& path = bkManager.getAllBackups()[index].first;
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(path.wstring())));
+			const auto* item = VectorTool::safeGet(backupFiles, index);
+			if (item != nullptr) {
+				QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(item->first.wstring())));
+			}
 		}
 		update_allBkList();
 	}
 }
 
-void BKMWidget::onClick_flushBtn()
-{
-	update_allBkList();
-	update_backupNameList();
-	update_SPButtonStat();
-}
-
 void BKMWidget::updateAll()
 {
-	//this->updateMtx.lock();
+	this->updateMtx.lock();
 	update_allBkList();
 	update_backupNameList();
 	update_SPButtonStat();
-	//this->updateMtx.unlock();
+	this->updateMtx.unlock();
 }
 
 void BKMWidget::onClick_settingsButton()
@@ -294,11 +274,11 @@ void BKMWidget::onClick_bk_roll_Button()
 	if (obj == ui->quickBkButton) {
 		bkManager.createBackup(L"", false);
 		lastClickTime = now;
+		showMessage("已添加任务");
 	}
 	else if (obj == ui->quickRollbackBtn) {
-		showMessage("快速回档中");
-		//todo 加入回档确认选项
 		bkManager.rollBack(0);
+		showMessage("已添加任务");
 	}
 	else if (obj == ui->saveBtn) {
 		SaveDialog dialog(this);
@@ -314,23 +294,12 @@ void BKMWidget::onClick_bk_roll_Button()
 				msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 				msg.setDefaultButton(QMessageBox::No);
 				int ret = msg.exec();
-				if (ret == QMessageBox::Yes) {
-					bkManager.createBackup(saveName, true);
-				}
-				else {
-					showMessage("已取消存档");
-				}
-				return;
+				bkManager.createBackup(saveName, ret == QMessageBox::Yes);
+				showMessage("已添加任务");
 			}
 			else {
 				bkManager.createBackup(saveName);
-				if (bkManager.goodStatus()) {
-					showMessage("存档成功");
-				}
-				else {
-					showMessage("存档失败！");
-				}
-				update_allBkList();
+				showMessage("已添加任务");
 			}
 		}
 
@@ -338,7 +307,7 @@ void BKMWidget::onClick_bk_roll_Button()
 	else if (obj == ui->loadBtn) {
 		auto backups = bkManager.getAllBackups();
 		if (backups.empty()) {
-			showMessage("失败：没有存档");
+			showMessage("失败：存档列表为空");
 			return;
 		}
 		int index = ui->allBkList->currentRow();
@@ -356,6 +325,7 @@ void BKMWidget::onClick_bk_roll_Button()
 				bkManager.rollBack(index);
 				lastClickTime = now;
 			}
+			showMessage("已添加任务");
 		}
 	}
 	else {
@@ -367,10 +337,24 @@ void BKMWidget::initLogger()
 {
 	ui->Logger->setReadOnly(true);
 	ui->Logger->setFont(QFont("Consolas", 8));
-	Logger::setGlobalLogger(ui->Logger);
-	Logger::setDefaultLogger();
-	qDebug() << "Logger successfully set";
+	connect(&Logger::instance(), &Logger::messageRequest, this, [&](const QString& msg) {
+		this->log(msg);
+		int lineCount = ui->Logger->document()->lineCount();
+		if (lineCount > 1000) {
+			QTextCursor cursor(ui->Logger->document());
+			cursor.movePosition(QTextCursor::Start);
+			for (int i = 0; i < lineCount - 1000; ++i) {
+				cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+				cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor);
+				cursor.removeSelectedText();
+				cursor.deleteChar();
+			}
+		}
 
+	});
+	connect(&Logger::instance(), &Logger::updateRequest, this, &BKMWidget::updateAll);
+	Logger::instance().installWidgetLogger();
+	Logger::debug("Logger successfully set");
 }
 
 void BKMWidget::setBtnIcon()
@@ -393,7 +377,6 @@ void BKMWidget::setBtnIcon()
 
 void BKMWidget::update_backupNameList()
 {
-	//bkConfigs.currentItem = ui->bkNameList->currentRow();
 	ui->bkNameList->blockSignals(true);
 	ui->bkNameList->clear();
 	for (int index = 0; index < bkManager.getSize(); index++) {
@@ -482,6 +465,11 @@ bool BKMWidget::check_backupValid()
 	return true;
 }
 
+void BKMWidget::log(const QString& msg)
+{
+	this->ui->Logger->appendPlainText(msg);
+}
+
 void BKMWidget::nameListDelete_dialog(QListWidgetItem* item)
 {
 	QMessageBox msgBox(this);
@@ -497,10 +485,10 @@ void BKMWidget::nameListDelete_dialog(QListWidgetItem* item)
 	//auto clickedBtn = msgBox.clickedButton();
 	int index = ui->bkNameList->row(item);
 	if (msgBox.clickedButton() == btnDetach) {
-		bkManager.removeBackup(index, false);
+		bkManager.removeBackupItem(index, false);
 	}
 	else if (msgBox.clickedButton() == btnDelete) {
-		bkManager.removeBackup(index, true);
+		bkManager.removeBackupItem(index, true);
 		QMessageBox msg;
 		msg.setWindowTitle("好消息");
 		msg.setText("为了防止手滑，没有任何存档被实际删除:)");

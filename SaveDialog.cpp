@@ -8,6 +8,7 @@ SaveDialog::SaveDialog(QWidget* parent)
 	ui->saveNameEdit->setFocus();
 	ui->saveNameEdit->setText(QString::fromStdWString(BackupConfig::getCurTimeForBackup()));
 	ui->saveNameEdit->selectAll();
+	ui->okButton->setDefault(true);
 }
 
 std::wstring SaveDialog::getUserInput()

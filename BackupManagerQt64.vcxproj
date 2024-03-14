@@ -79,7 +79,7 @@
     <ResourceCompile Include="BackupManagerQt64.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Logger.h" />
+    <QtMoc Include="Logger.h" />
     <ClInclude Include="StdStrTool.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="VectorTool.h" />

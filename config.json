@@ -9,6 +9,11 @@
             "backup_path": "E:/testfolder/case_backupfolder",
             "name": "dddd啊",
             "source_path": "E:/testfolder/case_folder/case_save"
+        },
+        {
+            "backup_path": "E:/testfolder/case_backupfolder",
+            "name": "大test",
+            "source_path": "C:/Users/jacky/Desktop/[DBD-Raws][赌博默示录][01-26TV全集][1080P][BDRip][HEVC-10bit][简体外挂][FLAC][MKV]"
         }
     ],
     "Version": "1.0.0"

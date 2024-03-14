@@ -8,10 +8,13 @@
 #include <qmutex>
 
 //todo 优化右键菜单，添加属性栏目
-//todo 将ThreadPool嵌入BackupManagerQt类
-//todo 给ThreadPool添加异常处理
 //todo 添加更多配置
 //todo 捕获线程池中的异常
+//todo 使用qt线程池，不能直接控制gui，改为发射信
+//todo 在存档列表加入更多存档信息
+//todo theres a problem in settings button
+//todo 添加快速操作的确认选项
+//todo 补充BackupManagerQt中的日志
 //主界面
 class BKMWidget : public QWidget
 {
@@ -29,7 +32,6 @@ private slots:
 	void onChange_bkNameList(QListWidgetItem* item);		//更新namelist和currentBackup
 	void showMenu_bkNameList(const QPoint& pos);
 	void showMenu_allBkList(const QPoint& pos);
-	void onClick_flushBtn();
 	void updateAll();
 
 private:
@@ -41,6 +43,7 @@ private:
 	void update_allBkList();
 	void nameListDelete_dialog(QListWidgetItem* item);
 	bool check_backupValid();
+	void log(const QString& msg);
 	QWidget* focusedList = QApplication::focusWidget();
 	BackupManagerQt bkManager;								//包含构造函数
 	Ui::BKMWidgetClass* ui = new Ui::BKMWidgetClass;

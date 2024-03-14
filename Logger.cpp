@@ -1,27 +1,14 @@
 #include "Logger.h"
 #include "BackupManager/BackupConfig.h"
 #include "StdStrTool.h"
+#include <qtextstream.h>
 #include <QMessageBox>
 
-QPlainTextEdit* Logger::logger = NULL;
-std::mutex Logger::loggerMtx;
 bool Logger::debugMode = true;
-
-void Logger::setGlobalLogger(QPlainTextEdit* newLogger)
-{
-	std::lock_guard<std::mutex> lock(loggerMtx);
-	Logger::logger = newLogger;
-}
 
 void Logger::append(const QString& msg)
 {
-	std::lock_guard<std::mutex> lock(loggerMtx);
-	if (logger != NULL) {
-		logger->appendPlainText(QString::fromStdWString(BackupConfig::getCurTimeForLogger() + L"> ") + msg);
-	}
-	else {
-		throw std::runtime_error("Error: logger does not exist!\n");
-	}
+	emit messageRequest(QString::fromStdWString(BackupConfig::getCurTimeForLogger() + L"> ") + msg);
 }
 
 void Logger::append(const std::wstring& msg)
@@ -39,30 +26,44 @@ void Logger::append(const char* msg)
 	Logger::append(QString::fromUtf8(msg));
 }
 
-void Logger::debug(const QString& msg)
+void Logger::update(bool stat)
 {
+	emit updateRequest(stat);
 }
 
-void Logger::myFileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+void Logger::customLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	QByteArray localMsg = msg.toLocal8Bit();
 	switch (type) {
 		case QtDebugMsg:
-			if (Logger::debugMode)Logger::append(QString("Debug: %1").arg(msg));
+			if (Logger::debugMode)instance().append(QString("Debug: %1").arg(msg));
 			break;
 		case QtInfoMsg:
-			Logger::append(QString("Info: %1").arg(msg));
+			instance().append(QString("Info: %1").arg(msg));
 			break;
 		case QtWarningMsg:
-			Logger::append(QString("Warning: %1").arg(msg));
+			instance().append(QString("Warning: %1").arg(msg));
 			break;
 		case QtCriticalMsg:
-			Logger::append(QString("Critical: %1").arg(msg));
+			instance().append(QString("Critical: %1").arg(msg));
 			break;
 		case QtFatalMsg:
-			Logger::append(QString("Fatal: %1").arg(msg));
+			instance().append(QString("Fatal: %1").arg(msg));
 			abort();
 	}
+}
+
+void Logger::fileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+	QFile file("log.txt");
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+		QTextStream(stderr) << "Cannot open log file: " << file.errorString();
+		return;
+	}
+	QTextStream out(&file);
+	out << msg << "\n";
+	file.flush();
+	QTextStream(stderr) << msg << "\n";
 }
 
 void Logger::warning(const QString& msg)
@@ -90,38 +91,43 @@ void Logger::err(const QString& msg)
 	Logger::log(msg, Logger::ERR);
 }
 
-void Logger::setDefaultLogger()
+void Logger::debug(const QString& msg)
 {
-	qInstallMessageHandler(Logger::myFileLogger);
+	Logger::log(msg, Logger::DEBUG);
+}
+
+void Logger::installWidgetLogger()
+{
+	qInstallMessageHandler(Logger::customLogger);
 }
 
 void Logger::log(const QString& msg, LogType type)
 {
 	switch (type) {
 		case LogType::LOG:
-			Logger::append(msg);
+			Logger::instance().append(msg);
 			break;
 		case LogType::DEBUG:
-			if (Logger::debugMode)Logger::append("Debug: " + msg);
+			if (Logger::debugMode)Logger::instance().append("Debug: " + msg);
 			break;
 		case LogType::CRITICAL:
-			Logger::append("Critical: " + msg);
+			Logger::instance().append("Critical: " + msg);
 			break;
 		case LogType::INFO:
-			Logger::append("Info: " + msg);
+			Logger::instance().append("Info: " + msg);
 			break;
 		case LogType::WARNING:
-			Logger::append("Warning: " + msg);
+			Logger::instance().append("Warning: " + msg);
 			break;
 		case LogType::FATAL:
-			Logger::append("FATAL: " + msg);
+			Logger::instance().append("FATAL: " + msg);
 			std::abort();			//program abort
 			break;
 		case LogType::ERR:
-			Logger::append("ERROR: " + msg);
+			Logger::instance().append("ERROR: " + msg);
 			throw std::runtime_error(msg.toStdString());
 			break;
 		default:
-			Logger::append("Unkown: " + msg);
+			Logger::instance().append("Unkown: " + msg);
 	}
 }
