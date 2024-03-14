@@ -6,6 +6,7 @@
 
 #privacy files
 config.json
+log.txt
 
 # User-specific files
 *.rsuser
@@ -365,3 +366,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/log.txt
