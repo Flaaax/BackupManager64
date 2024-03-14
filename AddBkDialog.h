@@ -10,7 +10,7 @@ class AddBkDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	explicit AddBkDialog(QWidget* parent = nullptr, BackupItem item = BackupItem());
+	AddBkDialog(QWidget* parent = nullptr, BackupItem item = BackupItem());
 	BackupItem getUserInput()const;
 
 private slots:

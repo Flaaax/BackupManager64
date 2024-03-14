@@ -10,16 +10,17 @@ class SettingsDialog :  public QDialog
 	Q_OBJECT
 
 public:
-	explicit SettingsDialog(QWidget* parent = nullptr, const BKConfigs& currentConfigs = BKConfigs());
+	explicit SettingsDialog(QWidget* parent = nullptr, const BackupConfig& currentConfigs = BackupConfig());
 	~SettingsDialog() {}
-	BKConfigs getUserInput() const;
+	BackupConfig getUserInput() const;
 
 private slots:
 	void onFinish_autobkPeriodEd();
 	void onClick_okButton();
+	bool eventFilter(QObject* watched, QEvent* event)override;
 
 private:
-	BKConfigs configs;
+	BackupConfig configs;
 	Ui::SettingsDialogClass* ui = new Ui::SettingsDialogClass;
 };
 

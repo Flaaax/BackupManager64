@@ -49,8 +49,8 @@
   <widget class="QPushButton" name="pauseButton">
    <property name="geometry">
     <rect>
-     <x>493</x>
-     <y>330</y>
+     <x>490</x>
+     <y>334</y>
      <width>60</width>
      <height>60</height>
     </rect>
@@ -298,7 +298,7 @@
     <string>L</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="Logger">
+  <widget class="QPlainTextEdit" name="loggerEdit">
    <property name="geometry">
     <rect>
      <x>288</x>

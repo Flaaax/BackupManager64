@@ -16,6 +16,8 @@
 #include <qtextdocument.h>
 #include <qtimer.h>
 #include <qurl.h>
+#include <qmenubar.h>
+
 
 namespace fs = std::filesystem;
 
@@ -24,9 +26,9 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 	QWidget* widget = new QWidget();
 	QHBoxLayout* layout = new QHBoxLayout(widget);
 	static const QFont font("微软雅黑");
-	//QString leftText = QString::fromStdWString(BackupConfig::getBackupName(filepath));
+	//QString leftText = QString::fromStdWString(ConfigHelper::getBackupName(filepath));
 	QString leftText = QString::fromStdWString(filepath.filename().wstring());
-	QString rightText = QString::fromStdString(BackupConfig::timeSinceModification(filepath));
+	QString rightText = QString::fromStdString(ConfigHelper::timeSinceModification(filepath));
 	QLabel* leftLabel = new QLabel(leftText);
 	QLabel* rightLabel = new QLabel(rightText);
 	leftLabel->setFont(font);
@@ -50,7 +52,7 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	this->bkManager.setGeneralCallback([this](bool stat) {Logger::instance().update(stat); });
 	this->initLogger();
 	this->setFixedSize(585, 440);
-	std::string version = BackupConfig::loadVersion();
+	std::string version = ConfigHelper::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
 	this->setWindowTitle(title);
 	this->setBtnIcon();
@@ -59,6 +61,7 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	ui->allBkList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->bkNameList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
 	ui->allBkList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
+	ui->loggerEdit->setStyleSheet("QListWidget { background-color: rgb(244,244,244); }");
 	connect(ui->addBkButton, &QPushButton::clicked, this, &BKMWidget::onClick_addBkButton);
 	connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::onClick_saveButton);
 	connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::onClick_settingsButton);
@@ -74,14 +77,10 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	connect(ui->bkNameList, &QListWidget::customContextMenuRequested, this, &BKMWidget::showMenu_bkNameList);
 	connect(ui->allBkList, &QListWidget::customContextMenuRequested, this, &BKMWidget::showMenu_allBkList);
 	this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
-	this->update_backupNameList();
-	this->update_SPButtonStat();
-	this->update_allBkList();
-	//QTimer* timer = new QTimer(this);
-	//connect(timer, &QTimer::timeout, this, [this]() {update_allBkList(); });
-	//timer->start(30000);	//每5min更新一次存档列表
-	//QMessageBox::critical(nullptr, "Exception Caught", "BKMWidget init");
 
+	this->initMenuBar();
+
+	this->updateAll();
 }
 
 void BKMWidget::onClick_addBkButton()
@@ -105,11 +104,11 @@ void BKMWidget::onClick_SPButton()
 	QObject* obj = sender();
 	time_t bktime = bkManager.getAutoBackupTimer();
 	if (obj == ui->startButton) {
-		bkManager.resumeAutoBackup();
+		bkManager.startAutoBackup();
 		showMessage(QString("自动存档：启用 time=") + QString::number(bktime));
 	}
 	else if (obj == ui->pauseButton) {
-		bkManager.pauseAutoBackup();
+		bkManager.stopAutoBackup();
 		showMessage(QString("自动存档：禁用 time=") + QString::number(bktime));
 	}
 	update_SPButtonStat();
@@ -246,6 +245,7 @@ void BKMWidget::onClick_settingsButton()
 	int res = newDialog.exec();
 	if (res == QDialog::Accepted) {
 		bkManager.updateConfigs(newDialog.getUserInput());
+		bkManager.resetAutoBackup();
 		showMessage("保存成功");
 	}
 }
@@ -333,15 +333,57 @@ void BKMWidget::onClick_bk_roll_Button()
 	}
 }
 
+void BKMWidget::initMenuBar()
+{
+	//todo there's a lot to do LOL
+	//todo maybe add a rename option
+	QVBoxLayout* menuLayout = new QVBoxLayout(this);
+	QMenuBar* menuBar = new QMenuBar(this);
+	menuLayout->setMenuBar(menuBar);
+
+	auto fileMenu=menuBar->addMenu("File");
+	auto newBackupItemAction = fileMenu->addAction("Add new");
+	auto deleteBackupItemAction = fileMenu->addAction("Delete");
+	auto compressMenu = fileMenu->addMenu("Compress/Decompress");
+	auto compressAction = compressMenu->addAction("Compress");
+	auto decompressAction = compressMenu->addAction("Decompress");
+	//auto saveConfigAction = fileMenu->addAction("Save");
+	auto settingsAction = fileMenu->addAction("Settings");
+	connect(fileMenu->addAction("Quit"), &QAction::triggered, [this]() {
+		//add context
+	});
+
+	auto editMenu = menuBar->addMenu("Backup");
+	auto backupAction = editMenu->addAction("Create");
+	auto rollbackAction = editMenu->addAction("Rollback");
+	auto deleteBackupAction = editMenu->addAction("Delete");
+	auto copyAction = editMenu->addAction("Copy");
+	auto autoMenu = editMenu->addMenu("Auto");
+	auto startAutoAction = autoMenu->addMenu("Start Auto Backup");
+	auto stopAutoAction = autoMenu->addMenu("Stop Auto Backup");
+	auto resetAutoAction = autoMenu->addMenu("Reset Auto Backup");
+
+	auto viewMenu = menuBar->addMenu("View");
+	auto refreshAction = viewMenu->addAction("Refresh");
+
+	auto settingsMenu = menuBar->addMenu("Settings");
+	auto preferencesAction = settingsMenu->addAction("Preferences");
+
+	auto helpMenu = menuBar->addMenu("Help");
+	auto helpAction = helpMenu->addAction("View Help");
+	auto aboutAction = helpMenu->addAction("About");
+
+}
+
 void BKMWidget::initLogger()
 {
-	ui->Logger->setReadOnly(true);
-	ui->Logger->setFont(QFont("Consolas", 8));
+	ui->loggerEdit->setReadOnly(true);
+	ui->loggerEdit->setFont(QFont("Consolas", 8));
 	connect(&Logger::instance(), &Logger::messageRequest, this, [&](const QString& msg) {
 		this->log(msg);
-		int lineCount = ui->Logger->document()->lineCount();
+		int lineCount = ui->loggerEdit->document()->lineCount();
 		if (lineCount > 1000) {
-			QTextCursor cursor(ui->Logger->document());
+			QTextCursor cursor(ui->loggerEdit->document());
 			cursor.movePosition(QTextCursor::Start);
 			for (int i = 0; i < lineCount - 1000; ++i) {
 				cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
@@ -354,7 +396,7 @@ void BKMWidget::initLogger()
 	});
 	connect(&Logger::instance(), &Logger::updateRequest, this, &BKMWidget::updateAll);
 	Logger::instance().installWidgetLogger();
-	Logger::debug("Logger successfully set");
+	Logger::debug("loggerEdit successfully set");
 }
 
 void BKMWidget::setBtnIcon()
@@ -418,7 +460,7 @@ void BKMWidget::showMessage(const QString& message)
 	riseAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 	opacityAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 	//QTimer::singleShot(1200, msg, &QLabel::deleteLater);
-	//Logger::append(message);
+	//loggerEdit::append(message);
 }
 
 void BKMWidget::update_SPButtonStat()
@@ -438,7 +480,7 @@ void BKMWidget::update_allBkList()
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
 			QListWidgetItem* item = new QListWidgetItem(ui->allBkList);
-			std::string time = BackupConfig::timeSinceModification(bk.first);
+			std::string time = ConfigHelper::timeSinceModification(bk.first);
 			QWidget* listItemWidget = createAllbkListItem(bk.first);
 			item->setSizeHint(listItemWidget->sizeHint());
 			ui->allBkList->setItemWidget(item, listItemWidget);
@@ -446,7 +488,7 @@ void BKMWidget::update_allBkList()
 		}
 	}
 	else {
-		QListWidgetItem* item = new QListWidgetItem("空列表", ui->allBkList);
+		QListWidgetItem* item = new QListWidgetItem("<空>", ui->allBkList);
 	}
 	ui->allBkList->blockSignals(false);
 }
@@ -467,7 +509,7 @@ bool BKMWidget::check_backupValid()
 
 void BKMWidget::log(const QString& msg)
 {
-	this->ui->Logger->appendPlainText(msg);
+	this->ui->loggerEdit->appendPlainText(msg);
 }
 
 void BKMWidget::nameListDelete_dialog(QListWidgetItem* item)

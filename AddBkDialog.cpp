@@ -34,7 +34,7 @@ static bool isFileNameValid(const QString& fileName)
 }
 
 
-AddBkDialog::AddBkDialog(QWidget* parent, BackupItem item)
+AddBkDialog::AddBkDialog(QWidget* parent, BackupItem item) :QDialog(parent)
 {
 	ui->setupUi(this);
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);

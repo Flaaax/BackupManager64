@@ -35,6 +35,7 @@ private slots:
 	void updateAll();
 
 private:
+	void initMenuBar();
 	void initLogger();
 	void setBtnIcon();
 	void update_backupNameList();
