@@ -68,7 +68,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QListWidget" name="bkNameList">
+  <widget class="QListWidget" name="backupItemList">
    <property name="geometry">
     <rect>
      <x>32</x>
@@ -90,7 +90,7 @@
     <enum>QAbstractItemView::SelectItems</enum>
    </property>
   </widget>
-  <widget class="QPushButton" name="quickBkButton">
+  <widget class="QPushButton" name="quickSaveBtn">
    <property name="geometry">
     <rect>
      <x>401</x>
@@ -134,7 +134,7 @@
     <string>+新存档</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="quickRollbackBtn">
+  <widget class="QPushButton" name="quickLoadBtn">
    <property name="geometry">
     <rect>
      <x>401</x>
@@ -200,7 +200,7 @@
     </size>
    </property>
   </widget>
-  <widget class="QListWidget" name="allBkList">
+  <widget class="QListWidget" name="backupFileList">
    <property name="geometry">
     <rect>
      <x>30</x>

@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Logger.h" />
+    <ClInclude Include="QWidgetTool.h" />
     <ClInclude Include="StdStrTool.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="VectorTool.h" />

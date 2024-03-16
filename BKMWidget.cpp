@@ -1,4 +1,4 @@
-#pragma execution_character_set("utf-8")
+ï»¿#pragma execution_character_set("utf-8")
 #include "AddBkDialog.h"
 #include "BKMWidget.h"
 #include "Logger.h"
@@ -17,6 +17,7 @@
 #include <qtimer.h>
 #include <qurl.h>
 #include <qmenubar.h>
+#include "QWidgetTool.h"
 
 
 namespace fs = std::filesystem;
@@ -25,7 +26,7 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 {
 	QWidget* widget = new QWidget();
 	QHBoxLayout* layout = new QHBoxLayout(widget);
-	static const QFont font("Î¢ÈíÑÅºÚ");
+	static const QFont font("å¾®è½¯é›…é»‘");
 	//QString leftText = QString::fromStdWString(ConfigHelper::getBackupName(filepath));
 	QString leftText = QString::fromStdWString(filepath.filename().wstring());
 	QString rightText = QString::fromStdString(ConfigHelper::timeSinceModification(filepath));
@@ -37,10 +38,10 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 	layout->addWidget(leftLabel);
 	layout->addWidget(rightLabel);
 	layout->setSpacing(0);
-	// È·±£ÓÒ²àµÄ±êÇ©¿ÉÒÔÀ­ÉìÒÔÌî³ä¿ÉÓÃ¿Õ¼ä
+	// ç¡®ä¿å³ä¾§çš„æ ‡ç­¾å¯ä»¥æ‹‰ä¼¸ä»¥å¡«å……å¯ç”¨ç©ºé—´
 	layout->setStretch(1, 1);
-	layout->setContentsMargins(3, 3, 3, 3); // ÉèÖÃ½ÏĞ¡µÄ±ß¾à
-	//layout->setSpacing(3); // ÉèÖÃ½ÏĞ¡µÄ¿Ø¼ş¼ä¾à
+	layout->setContentsMargins(3, 3, 3, 3); // è®¾ç½®è¾ƒå°çš„è¾¹è·
+	//layout->setSpacing(3); // è®¾ç½®è¾ƒå°çš„æ§ä»¶é—´è·
 	widget->setLayout(layout);
 
 	return widget;
@@ -55,27 +56,27 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	std::string version = ConfigHelper::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
 	this->setWindowTitle(title);
-	this->setBtnIcon();
-	ui->bkNameList->setSortingEnabled(false);
-	ui->bkNameList->setContextMenuPolicy(Qt::CustomContextMenu);
-	ui->allBkList->setContextMenuPolicy(Qt::CustomContextMenu);
-	ui->bkNameList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
-	ui->allBkList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
+	this->initButtonIcon();
+	ui->backupItemList->setSortingEnabled(false);
+	ui->backupItemList->setContextMenuPolicy(Qt::CustomContextMenu);
+	ui->backupFileList->setContextMenuPolicy(Qt::CustomContextMenu);
+	ui->backupItemList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
+	ui->backupFileList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
 	ui->loggerEdit->setStyleSheet("QListWidget { background-color: rgb(244,244,244); }");
-	connect(ui->addBkButton, &QPushButton::clicked, this, &BKMWidget::onClick_addBkButton);
-	connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::onClick_saveButton);
-	connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::onClick_settingsButton);
+	connect(ui->addBkButton, &QPushButton::clicked, this, &BKMWidget::addNewBackupItem);
+	connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::saveConfigs);
+	connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::openSettings);
 	connect(ui->flushBtn, &QPushButton::clicked, this, &BKMWidget::updateAll);
 	connect(ui->startButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
 	connect(ui->pauseButton, SIGNAL(clicked()), this, SLOT(onClick_SPButton()));
-	connect(ui->quickBkButton, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
-	connect(ui->quickRollbackBtn, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
+	connect(ui->quickSaveBtn, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
+	connect(ui->quickLoadBtn, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
 	connect(ui->saveBtn, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
 	connect(ui->loadBtn, SIGNAL(clicked()), this, SLOT(onClick_bk_roll_Button()));
-	connect(ui->bkNameList, &QListWidget::itemChanged, this, &BKMWidget::onChange_bkNameList);
-	connect(ui->bkNameList, &QListWidget::itemChanged, this, &BKMWidget::update_allBkList);
-	connect(ui->bkNameList, &QListWidget::customContextMenuRequested, this, &BKMWidget::showMenu_bkNameList);
-	connect(ui->allBkList, &QListWidget::customContextMenuRequested, this, &BKMWidget::showMenu_allBkList);
+	connect(ui->backupItemList, &QListWidget::itemChanged, this, &BKMWidget::onItemChange_bkNameList);
+	connect(ui->backupItemList, &QListWidget::itemChanged, this, &BKMWidget::update_allBkList);
+	connect(ui->backupItemList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_bkNameList);
+	connect(ui->backupFileList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_allBkList);
 	this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 
 	this->initMenuBar();
@@ -83,45 +84,45 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	this->updateAll();
 }
 
-void BKMWidget::onClick_addBkButton()
+void BKMWidget::addNewBackupItem()
 {
 	AddBkDialog newDialog(this);
 	if (newDialog.exec() == QDialog::Accepted) {
 		bkManager.addBackup(newDialog.getUserInput());
 		update_backupNameList();
-		showMessage("Ìí¼Ó´æµµ³É¹¦");
+		showMessage("æ·»åŠ å­˜æ¡£æˆåŠŸ");
 	}
 }
 
-void BKMWidget::onClick_saveButton()
+void BKMWidget::saveConfigs()
 {
 	bkManager.saveAll();
-	showMessage("±£´æ³É¹¦");
+	showMessage("ä¿å­˜æˆåŠŸ");
 }
 
 void BKMWidget::onClick_SPButton()
 {
 	QObject* obj = sender();
-	time_t bktime = bkManager.getAutoBackupTimer();
+
 	if (obj == ui->startButton) {
 		bkManager.startAutoBackup();
-		showMessage(QString("×Ô¶¯´æµµ£ºÆôÓÃ time=") + QString::number(bktime));
+		showMessage("è‡ªåŠ¨å­˜æ¡£ï¼šå¯ç”¨ã€‚å‰©ä½™" + QString::number(bkManager.getAutoBackupTimer()) + "ç§’");
 	}
 	else if (obj == ui->pauseButton) {
 		bkManager.stopAutoBackup();
-		showMessage(QString("×Ô¶¯´æµµ£º½ûÓÃ time=") + QString::number(bktime));
+		showMessage("è‡ªåŠ¨å­˜æ¡£ï¼šç¦ç”¨ã€‚å‰©ä½™" + QString::number(bkManager.getAutoBackupTimer()) + "ç§’");
 	}
 	update_SPButtonStat();
 }
 
-void BKMWidget::onChange_bkNameList(QListWidgetItem* item)
+void BKMWidget::onItemChange_bkNameList(QListWidgetItem* item)
 {
-	ui->bkNameList->blockSignals(true);
+	ui->backupItemList->blockSignals(true);
 	bkManager.resetAutoBackup();
 	if (item->checkState() == Qt::Checked) {
 		int checkedItemPos = -1;
-		for (int i = 0; i < ui->bkNameList->count(); ++i) {
-			QListWidgetItem* otherItem = ui->bkNameList->item(i);
+		for (int i = 0; i < ui->backupItemList->count(); ++i) {
+			QListWidgetItem* otherItem = ui->backupItemList->item(i);
 			if (otherItem != item) {
 				otherItem->setCheckState(Qt::Unchecked);
 			}
@@ -134,32 +135,32 @@ void BKMWidget::onChange_bkNameList(QListWidgetItem* item)
 	else {
 		bkManager.setBackup(-1);
 	}
-	ui->bkNameList->blockSignals(false);
+	ui->backupItemList->blockSignals(false);
 }
 
-void BKMWidget::showMenu_bkNameList(const QPoint& pos)
+void BKMWidget::callMenu_bkNameList(const QPoint& pos)
 {
-	QListWidgetItem* item = ui->bkNameList->itemAt(pos);
-	int index = ui->bkNameList->row(item);
+	QListWidgetItem* item = ui->backupItemList->itemAt(pos);
+	int index = ui->backupItemList->row(item);
 	if (item) {
 		QMenu menu;
-		QMenu* browseMenu = menu.addMenu(tr("ä¯ÀÀÂ·¾¶"));
-		QAction* browseSourceAction = browseMenu->addAction(tr("Ô´ÎÄ¼şÂ·¾¶"));
-		QAction* browseBackupAction = browseMenu->addAction(tr("´æµµÂ·¾¶"));
+		QMenu* browseMenu = menu.addMenu(tr("æµè§ˆè·¯å¾„"));
+		QAction* browseSourceAction = browseMenu->addAction(tr("æºæ–‡ä»¶è·¯å¾„"));
+		QAction* browseBackupAction = browseMenu->addAction(tr("å­˜æ¡£è·¯å¾„"));
 
-		QAction* editAction = menu.addAction(tr("±à¼­"));
+		QAction* editAction = menu.addAction(tr("ç¼–è¾‘"));
 
-		QMenu* deleteMenu = menu.addMenu(tr("ÒÆ³ı"));
-		QAction* removeAction = deleteMenu->addAction(tr("ÒÆ³ı"));
-		QAction* deleteAction = deleteMenu->addAction(tr("É¾³ı"));
+		QMenu* deleteMenu = menu.addMenu(tr("ç§»é™¤"));
+		QAction* removeAction = deleteMenu->addAction(tr("ç§»é™¤"));
+		QAction* deleteAction = deleteMenu->addAction(tr("åˆ é™¤"));
 
-		QMenu* moveMenu = menu.addMenu(tr("ÒÆ¶¯"));
-		QAction* moveUpAction = moveMenu->addAction(tr("ÉÏÒÆ"));
-		QAction* moveDownAction = moveMenu->addAction(tr("ÏÂÒÆ"));
+		QMenu* moveMenu = menu.addMenu(tr("ç§»åŠ¨"));
+		QAction* moveUpAction = moveMenu->addAction(tr("ä¸Šç§»"));
+		QAction* moveDownAction = moveMenu->addAction(tr("ä¸‹ç§»"));
 
-		QAction* selectedAction = menu.exec(ui->bkNameList->viewport()->mapToGlobal(pos));
+		QAction* selectedAction = menu.exec(ui->backupItemList->viewport()->mapToGlobal(pos));
 		if (selectedAction == deleteAction) {
-			nameListDelete_dialog(item);
+			callBackupItemDeleteDialog(item);
 		}
 		else if (selectedAction == browseSourceAction) {
 			QString sourcePath = QString::fromStdString(bkManager.getBackup(index).source_path.string());
@@ -183,7 +184,7 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 			update_backupNameList();
 		}
 		else if (selectedAction == moveUpAction || selectedAction == moveDownAction) {
-			int index = ui->bkNameList->currentRow();
+			int index = ui->backupItemList->currentRow();
 			int next_index = -1;
 			if (index == -1) {
 				return;
@@ -197,23 +198,23 @@ void BKMWidget::showMenu_bkNameList(const QPoint& pos)
 			if (next_index != -1) {
 				bkManager.swapBackups(index, next_index);
 				update_backupNameList();
-				ui->bkNameList->setCurrentRow(next_index);
+				ui->backupItemList->setCurrentRow(next_index);
 			}
 		}
 	}
 }
 
-void BKMWidget::showMenu_allBkList(const QPoint& pos)
+void BKMWidget::callMenu_allBkList(const QPoint& pos)
 {
-	QListWidgetItem* item = ui->allBkList->itemAt(pos);
-	int index = ui->allBkList->row(item);
+	QListWidgetItem* item = ui->backupFileList->itemAt(pos);
+	int index = ui->backupFileList->row(item);
 	auto backupFiles = bkManager.getAllBackups();
 	if (VectorTool::isValid(backupFiles, index)) {
 		QMenu menu;
-		QAction* copyAction = menu.addAction(tr("¸´ÖÆ"));
-		QAction* deleteAction = menu.addAction(tr("É¾³ı"));
-		QAction* browseAction = menu.addAction(tr("²é¿´Â·¾¶"));
-		QAction* selectedAction = menu.exec(ui->allBkList->viewport()->mapToGlobal(pos));
+		QAction* copyAction = menu.addAction(tr("å¤åˆ¶"));
+		QAction* deleteAction = menu.addAction(tr("åˆ é™¤"));
+		QAction* browseAction = menu.addAction(tr("æŸ¥çœ‹è·¯å¾„"));
+		QAction* selectedAction = menu.exec(ui->backupFileList->viewport()->mapToGlobal(pos));
 		if (selectedAction == copyAction) {
 			bkManager.copyBackup(index);
 		}
@@ -232,21 +233,21 @@ void BKMWidget::showMenu_allBkList(const QPoint& pos)
 
 void BKMWidget::updateAll()
 {
-	this->updateMtx.lock();
+	static QMutex updateMtx;
+	QMutexLocker locker(&updateMtx);
 	update_allBkList();
 	update_backupNameList();
 	update_SPButtonStat();
-	this->updateMtx.unlock();
 }
 
-void BKMWidget::onClick_settingsButton()
+void BKMWidget::openSettings()
 {
 	SettingsDialog newDialog(this, bkManager.getConfigs());
 	int res = newDialog.exec();
 	if (res == QDialog::Accepted) {
 		bkManager.updateConfigs(newDialog.getUserInput());
 		bkManager.resetAutoBackup();
-		showMessage("±£´æ³É¹¦");
+		showMessage("ä¿å­˜æˆåŠŸ");
 	}
 }
 
@@ -254,31 +255,31 @@ void BKMWidget::onClick_bk_roll_Button()
 {
 	qint64 now = QDateTime::currentMSecsSinceEpoch();
 	if (now - lastClickTime < 2000) {
-		// Èç¹û¾àÀëÉÏ´Îµã»÷²»×ã2Ãë£¬Ö±½Ó·µ»Ø
+		// å¦‚æœè·ç¦»ä¸Šæ¬¡ç‚¹å‡»ä¸è¶³2ç§’ï¼Œç›´æ¥è¿”å›
 		/*
 		QMessageBox msg(this);
 		msg.setWindowTitle(":(");
-		msg.setText("ÄãµãµÄÌ«¿ìÁË");
+		msg.setText("ä½ ç‚¹çš„å¤ªå¿«äº†");
 		msg.exec();
 		*/
 		QApplication::beep();
-		this->showMessage("ÄãµãµÄÌ«¿ìÁË");
+		this->showMessage("ä½ ç‚¹çš„å¤ªå¿«äº†");
 		return;
 	}
 	QObject* obj = sender();
 	if (bkManager.getBackup(BackupManagerQt::CURRENT).empty()) {
 		QApplication::beep();
-		this->showMessage("´íÎó£ºÄÚÈİÎª¿Õ");
+		this->showMessage("é”™è¯¯ï¼šå†…å®¹ä¸ºç©º");
 		return;
 	}
-	if (obj == ui->quickBkButton) {
+	if (obj == ui->quickSaveBtn) {
 		bkManager.createBackup(L"", false);
 		lastClickTime = now;
-		showMessage("ÒÑÌí¼ÓÈÎÎñ");
+		showMessage("å·²æ·»åŠ ä»»åŠ¡");
 	}
-	else if (obj == ui->quickRollbackBtn) {
+	else if (obj == ui->quickLoadBtn) {
 		bkManager.rollBack(0);
-		showMessage("ÒÑÌí¼ÓÈÎÎñ");
+		showMessage("å·²æ·»åŠ ä»»åŠ¡");
 	}
 	else if (obj == ui->saveBtn) {
 		SaveDialog dialog(this);
@@ -289,17 +290,17 @@ void BKMWidget::onClick_bk_roll_Button()
 			if (std::any_of(backups.begin(), backups.end(), [saveName](auto item) {return item.first.filename() == saveName; }))
 			{
 				QMessageBox msg(this);
-				msg.setWindowTitle("ÇëÈ·ÈÏ");
-				msg.setText(QString::fromStdWString(L"Òª¸²¸Ç´æµµ " + saveName + L"Âğ£¿"));
+				msg.setWindowTitle("è¯·ç¡®è®¤");
+				msg.setText(QString::fromStdWString(L"è¦è¦†ç›–å­˜æ¡£ " + saveName + L"å—ï¼Ÿ"));
 				msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 				msg.setDefaultButton(QMessageBox::No);
 				int ret = msg.exec();
 				bkManager.createBackup(saveName, ret == QMessageBox::Yes);
-				showMessage("ÒÑÌí¼ÓÈÎÎñ");
+				showMessage("å·²æ·»åŠ ä»»åŠ¡");
 			}
 			else {
 				bkManager.createBackup(saveName);
-				showMessage("ÒÑÌí¼ÓÈÎÎñ");
+				showMessage("å·²æ·»åŠ ä»»åŠ¡");
 			}
 		}
 
@@ -307,29 +308,29 @@ void BKMWidget::onClick_bk_roll_Button()
 	else if (obj == ui->loadBtn) {
 		auto backups = bkManager.getAllBackups();
 		if (backups.empty()) {
-			showMessage("Ê§°Ü£º´æµµÁĞ±íÎª¿Õ");
+			showMessage("å¤±è´¥ï¼šå­˜æ¡£åˆ—è¡¨ä¸ºç©º");
 			return;
 		}
-		int index = ui->allBkList->currentRow();
-		//todo ¼ÓÈë»ØµµÈ·ÈÏÑ¡Ïî
+		int index = ui->backupFileList->currentRow();
+		//todo åŠ å…¥å›æ¡£ç¡®è®¤é€‰é¡¹
 		if (index == -1)index = 0;
 		if (index >= 0 && index <= backups.size() - 1) {
 			QString name = QString::fromStdWString(backups[index].first.filename().wstring());
 			QMessageBox msg(this);
 			//msg.setMinimumSize(200, 300);
-			msg.setWindowTitle("Ö´ĞĞ»Øµµ");
-			msg.setText("ÕæµÄÒª»Øµµ\n" + name + "\nÂğ?");
+			msg.setWindowTitle("æ‰§è¡Œå›æ¡£");
+			msg.setText("çœŸçš„è¦å›æ¡£\n" + name + "\nå—?");
 			msg.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 			int res = msg.exec();
 			if (res == QMessageBox::Ok) {
 				bkManager.rollBack(index);
 				lastClickTime = now;
 			}
-			showMessage("ÒÑÌí¼ÓÈÎÎñ");
+			showMessage("å·²æ·»åŠ ä»»åŠ¡");
 		}
 	}
 	else {
-		showMessage("Ê§°Ü£ºÎ´Öª²Ù×÷");
+		showMessage("å¤±è´¥ï¼šæœªçŸ¥æ“ä½œ");
 	}
 }
 
@@ -341,16 +342,19 @@ void BKMWidget::initMenuBar()
 	QMenuBar* menuBar = new QMenuBar(this);
 	menuLayout->setMenuBar(menuBar);
 
-	auto fileMenu=menuBar->addMenu("File");
-	auto newBackupItemAction = fileMenu->addAction("Add new");
-	auto deleteBackupItemAction = fileMenu->addAction("Delete");
+	auto fileMenu = menuBar->addMenu("File");
+	connect(fileMenu->addAction("Add new"), &QAction::triggered, [this] {
+		this->addNewBackupItem();
+	});
+	connect(fileMenu->addAction("Delete"), &QAction::triggered, [this] {
+		auto items = QWidgetTool::checkedItems(ui->backupItemList);
+		this->callBackupItemDeleteDialog(ui->backupItemList->currentItem());
+	});
 	auto compressMenu = fileMenu->addMenu("Compress/Decompress");
 	auto compressAction = compressMenu->addAction("Compress");
 	auto decompressAction = compressMenu->addAction("Decompress");
-	//auto saveConfigAction = fileMenu->addAction("Save");
-	auto settingsAction = fileMenu->addAction("Settings");
-	connect(fileMenu->addAction("Quit"), &QAction::triggered, [this]() {
-		//add context
+	connect(fileMenu->addAction("Quit"), &QAction::triggered, [this] {
+		this->close();
 	});
 
 	auto editMenu = menuBar->addMenu("Backup");
@@ -364,14 +368,23 @@ void BKMWidget::initMenuBar()
 	auto resetAutoAction = autoMenu->addMenu("Reset Auto Backup");
 
 	auto viewMenu = menuBar->addMenu("View");
-	auto refreshAction = viewMenu->addAction("Refresh");
+	connect(viewMenu->addAction("Refresh"), &QAction::triggered, [this] {
+		this->updateAll();
+	});
 
 	auto settingsMenu = menuBar->addMenu("Settings");
-	auto preferencesAction = settingsMenu->addAction("Preferences");
+	connect(settingsMenu->addAction("Preferences"), &QAction::triggered, [this] {
+		this->openSettings();
+	});
 
 	auto helpMenu = menuBar->addMenu("Help");
 	auto helpAction = helpMenu->addAction("View Help");
-	auto aboutAction = helpMenu->addAction("About");
+	connect(helpMenu->addAction("About.."), &QAction::triggered, [this] {
+		QMessageBox::about(this, tr("About Application"),
+		tr("This is a <b>Qt application</b>.<br>"
+		"Version 1.0.0<br>"
+		   "Copyright Â© 2024 Your Name."));
+	});
 
 }
 
@@ -399,7 +412,7 @@ void BKMWidget::initLogger()
 	Logger::debug("loggerEdit successfully set");
 }
 
-void BKMWidget::setBtnIcon()
+void BKMWidget::initButtonIcon()
 {
 	ui->pauseButton->setIcon(QIcon("resources//redsquare.png"));
 	ui->pauseButton->setIconSize(QSize(60, 60));
@@ -419,10 +432,10 @@ void BKMWidget::setBtnIcon()
 
 void BKMWidget::update_backupNameList()
 {
-	ui->bkNameList->blockSignals(true);
-	ui->bkNameList->clear();
+	ui->backupItemList->blockSignals(true);
+	ui->backupItemList->clear();
 	for (int index = 0; index < bkManager.getSize(); index++) {
-		QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackup(index).name), ui->bkNameList);
+		QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackup(index).name), ui->backupItemList);
 		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 		if (index == bkManager.getConfigs().currentItem) {
 			item->setCheckState(Qt::Checked);
@@ -431,7 +444,7 @@ void BKMWidget::update_backupNameList()
 			item->setCheckState(Qt::Unchecked);
 		}
 	}
-	ui->bkNameList->blockSignals(false);
+	ui->backupItemList->blockSignals(false);
 }
 
 void BKMWidget::showMessage(const QString& message)
@@ -439,23 +452,23 @@ void BKMWidget::showMessage(const QString& message)
 	QLabel* msg = new QLabel(message, this);
 	msg->setGeometry(270, 40, 301, 21);
 	QFont font;
-	font.setFamily("Î¢ÈíÑÅºÚ");
+	font.setFamily("å¾®è½¯é›…é»‘");
 	font.setPointSize(10);
 	msg->setFont(font);
 	msg->show();
-	// up¶¯»­
+	// upåŠ¨ç”»
 	QPropertyAnimation* riseAnimation = new QPropertyAnimation(msg, "geometry");
-	riseAnimation->setDuration(1200); // ¶¯»­³ÖĞøÊ±¼ä
+	riseAnimation->setDuration(1200); // åŠ¨ç”»æŒç»­æ—¶é—´
 	riseAnimation->setStartValue(msg->geometry());
-	riseAnimation->setEndValue(QRect(msg->x(), msg->y() - 50, msg->width(), msg->height())); // ÉÏÉıĞ§¹û
-	// ÉèÖÃÍ¸Ã÷¶È¶¯»­
+	riseAnimation->setEndValue(QRect(msg->x(), msg->y() - 50, msg->width(), msg->height())); // ä¸Šå‡æ•ˆæœ
+	// è®¾ç½®é€æ˜åº¦åŠ¨ç”»
 	QGraphicsOpacityEffect* effect = new QGraphicsOpacityEffect(msg);
 	msg->setGraphicsEffect(effect);
 	QPropertyAnimation* opacityAnimation = new QPropertyAnimation(effect, "opacity");
-	opacityAnimation->setDuration(1000); // ³ÖĞøÊ±¼ä
-	opacityAnimation->setStartValue(0.9); // ¿ªÊ¼Í¸Ã÷¶È
-	opacityAnimation->setEndValue(0.0); // ½áÊøÍ¸Ã÷
-	// µ±¶¯»­Íê³ÉºóÉ¾³ılabel
+	opacityAnimation->setDuration(1000); // æŒç»­æ—¶é—´
+	opacityAnimation->setStartValue(0.9); // å¼€å§‹é€æ˜åº¦
+	opacityAnimation->setEndValue(0.0); // ç»“æŸé€æ˜
+	// å½“åŠ¨ç”»å®Œæˆååˆ é™¤label
 	QObject::connect(riseAnimation, &QPropertyAnimation::finished, msg, &QLabel::deleteLater);
 	riseAnimation->start(QPropertyAnimation::DeleteWhenStopped);
 	opacityAnimation->start(QPropertyAnimation::DeleteWhenStopped);
@@ -472,35 +485,35 @@ void BKMWidget::update_SPButtonStat()
 
 void BKMWidget::update_allBkList()
 {
-	ui->allBkList->blockSignals(true);
-	ui->allBkList->clear();
+	ui->backupFileList->blockSignals(true);
+	ui->backupFileList->clear();
 	auto backups = bkManager.getAllBackups();
 	//int currentItem = bkManager.getConfigs().currentItem;
 	//QString name = QString::fromStdString(bkManager.getBackup(currentItem).name);
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
-			QListWidgetItem* item = new QListWidgetItem(ui->allBkList);
+			QListWidgetItem* item = new QListWidgetItem(ui->backupFileList);
 			std::string time = ConfigHelper::timeSinceModification(bk.first);
 			QWidget* listItemWidget = createAllbkListItem(bk.first);
 			item->setSizeHint(listItemWidget->sizeHint());
-			ui->allBkList->setItemWidget(item, listItemWidget);
-			ui->allBkList->addItem(item);
+			ui->backupFileList->setItemWidget(item, listItemWidget);
+			ui->backupFileList->addItem(item);
 		}
 	}
 	else {
-		QListWidgetItem* item = new QListWidgetItem("<¿Õ>", ui->allBkList);
+		QListWidgetItem* item = new QListWidgetItem("<ç©º>", ui->backupFileList);
 	}
-	ui->allBkList->blockSignals(false);
+	ui->backupFileList->blockSignals(false);
 }
 
 bool BKMWidget::check_backupValid()
 {
 	if (bkManager.isBackupValid(BackupManagerQt::ALL)) {
 		QMessageBox msg(this);
-		msg.setWindowTitle("´íÎó");
-		QString text = "´æµµ " + QString::fromStdWString(bkManager.getBackup().name) + " ÕÒ²»µ½Â·¾¶£¬\n»òÕßÂ·¾¶±»ĞŞ¸Ä";
+		msg.setWindowTitle("é”™è¯¯");
+		QString text = "å­˜æ¡£ " + QString::fromStdWString(bkManager.getBackup().name) + " æ‰¾ä¸åˆ°è·¯å¾„ï¼Œ\næˆ–è€…è·¯å¾„è¢«ä¿®æ”¹";
 		msg.setText(text);
-		QPushButton* btn = msg.addButton(tr("È·¶¨"), QMessageBox::AcceptRole);
+		QPushButton* btn = msg.addButton(tr("ç¡®å®š"), QMessageBox::AcceptRole);
 		msg.exec();
 		return false;
 	}
@@ -512,28 +525,35 @@ void BKMWidget::log(const QString& msg)
 	this->ui->loggerEdit->appendPlainText(msg);
 }
 
-void BKMWidget::nameListDelete_dialog(QListWidgetItem* item)
+void BKMWidget::callBackupItemDeleteDialog(QListWidgetItem* item)
 {
+	if (item == nullptr) {
+		QMessageBox msg(this);
+		msg.setWindowTitle("æç¤º");
+		msg.setText("æ²¡æœ‰é€‰ä¸­ä»»ä½•å­˜æ¡£");
+		msg.exec();
+		return;
+	}
 	QMessageBox msgBox(this);
-	msgBox.setWindowTitle(tr("É¾³ı´æµµ"));
+	msgBox.setWindowTitle(tr("ç¡®å®šåˆ é™¤é€‰ä¸­çš„å­˜æ¡£å—ï¼Ÿ"));
 	QString name = item->text();
-	QString text = "Ñ¡Ôñ\"ÒÆ³ı\"»á½« " + name + " ´ÓÁĞ±íÖĞÅÅ³ı\nÑ¡Ôñ\"É¾³ıÈ«²¿\"»áÉ¾³ı " + name + " ÖĞµÄËùÓĞ´æµµ\n";
+	QString text = "é€‰æ‹©\"ç§»é™¤\"ä¼šå°† " + name + " ä»åˆ—è¡¨ä¸­æ’é™¤\né€‰æ‹©\"åˆ é™¤å…¨éƒ¨\"ä¼šåˆ é™¤ " + name + " ä¸­çš„æ‰€æœ‰å­˜æ¡£\n";
 	msgBox.setText(text);
-	QPushButton* btnDetach = msgBox.addButton(tr("ÒÆ³ı"), QMessageBox::AcceptRole);
-	QPushButton* btnDelete = msgBox.addButton(tr("É¾³ıÈ«²¿"), QMessageBox::DestructiveRole);
-	QPushButton* btnCancel = msgBox.addButton(tr("È¡Ïû"), QMessageBox::RejectRole);
+	QPushButton* btnDetach = msgBox.addButton(tr("ç§»é™¤"), QMessageBox::AcceptRole);
+	QPushButton* btnDelete = msgBox.addButton(tr("åˆ é™¤å…¨éƒ¨"), QMessageBox::DestructiveRole);
+	QPushButton* btnCancel = msgBox.addButton(tr("å–æ¶ˆ"), QMessageBox::RejectRole);
 	msgBox.setDefaultButton(btnCancel);
 	msgBox.exec();
 	//auto clickedBtn = msgBox.clickedButton();
-	int index = ui->bkNameList->row(item);
+	int index = ui->backupItemList->row(item);
 	if (msgBox.clickedButton() == btnDetach) {
 		bkManager.removeBackupItem(index, false);
 	}
 	else if (msgBox.clickedButton() == btnDelete) {
 		bkManager.removeBackupItem(index, true);
 		QMessageBox msg;
-		msg.setWindowTitle("ºÃÏûÏ¢");
-		msg.setText("ÎªÁË·ÀÖ¹ÊÖ»¬£¬Ã»ÓĞÈÎºÎ´æµµ±»Êµ¼ÊÉ¾³ı:)");
+		msg.setWindowTitle("è°ƒè¯•æ¶ˆæ¯");
+		msg.setText("é¢„è§ˆç‰ˆæœ¬ä¸­ï¼Œæ²¡æœ‰ä»»ä½•å­˜æ¡£è¢«åˆ é™¤ï¼Œè¯·è‡ªè¡Œæ‰‹åŠ¨åˆ é™¤");
 		msg.exec();
 	}
 	bkManager.saveAll();

@@ -2,7 +2,7 @@
     "AutobackupConfigs": {
         "AutobackupEnabled": false,
         "AutobackupPeriod": 30,
-        "LastSelectedItem": 1
+        "LastSelectedItem": 0
     },
     "BackupList": [
         {
