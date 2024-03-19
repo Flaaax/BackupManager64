@@ -20,6 +20,13 @@ class BKMWidget : public QWidget
 {
 	Q_OBJECT
 public:
+	enum Action {
+		QS,
+		S,
+		QL,
+		L,
+		UNKNOWN
+	};
 
 	BKMWidget(QWidget* parent = nullptr);
 	~BKMWidget() { bkManager.saveAll();}					//dont need to delete ui
@@ -28,13 +35,13 @@ private slots:
 
 	void addNewBackupItem();
 	void saveConfigs();
-	void onClick_SPButton();								//start and pause button
+	void handeAutoSave();								//start and pause button
 	void openSettings();
-	void onClick_bk_roll_Button();
-	void onItemChange_bkNameList(QListWidgetItem* item);		//更新namelist和currentBackup
-	void callMenu_bkNameList(const QPoint& pos);
-	void callMenu_allBkList(const QPoint& pos);
-	void updateAll();
+	void handleQSQL(Action action);
+	void onItemChange_bkNameList(QListWidgetItem* item);	//更新namelist和currentBackup
+	void callMenu_backupItemList(const QPoint& pos);
+	void callMenu_backupFileList(const QPoint& pos);
+	void refresh();
 
 private:
 
@@ -42,15 +49,13 @@ private:
 
 	BackupManagerQt bkManager;								//包含构造函数
 
-	qint64 lastClickTime = 0;
-
 	void initMenuBar();
 	void initLogger();
 	void initButtonIcon();
-	void showMessage(const QString& message);
-	void update_backupNameList();
-	void update_SPButtonStat();
-	void update_allBkList();
+	void showMsg(const QString& message);
+	void update_backupItemList();
+	void update_autoBackupButtonStat();
+	void update_backupFileList();
 	void callBackupItemDeleteDialog(QListWidgetItem* item);
 	bool check_backupValid();
 	void log(const QString& msg);
