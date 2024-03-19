@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 		return a.exec();
 	}
 	catch (const std::exception& e) {
-		QMessageBox::critical(nullptr, "Exception Caught", e.what());
+		QMessageBox::critical(nullptr, "非正常退出", e.what());
 		return -1;
 	}
 	catch (...) {
