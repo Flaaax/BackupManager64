@@ -10,7 +10,7 @@ SettingsDialog::SettingsDialog(QWidget* parent, const BackupConfig& currentConfi
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	ui->autobkPeriodEd->setText(QString::fromStdString(std::to_string(configs.autobackupPeriod)));
 	ui->autobkPeriodEd->setPlaceholderText(QString::fromStdString(std::to_string(30ULL)));
-	ui->autobkEnableBtn->setChecked(configs.autobackupEnabled);
+	//ui->autobkEnableBtn->setChecked(configs.autobackupEnabled);
 	connect(ui->okButton, &QPushButton::clicked, this, &SettingsDialog::onClick_okButton);
 	connect(ui->rejectButton, &QPushButton::clicked, this, [this]() {this->reject(); });
 }
@@ -22,7 +22,7 @@ BackupConfig SettingsDialog::getUserInput() const
 
 void SettingsDialog::onClick_okButton()
 {
-	configs.autobackupEnabled = ui->autobkEnableBtn->isChecked();
+	//configs.autobackupEnabled = ui->autobkEnableBtn->isChecked();
 	configs.autobackupPeriod = ui->autobkPeriodEd->text().toLongLong();
 	this->accept();
 }

@@ -21,11 +21,11 @@
   <property name="toolTip">
    <string notr="true"/>
   </property>
-  <widget class="QPushButton" name="startButton">
+  <widget class="QPushButton" name="autoSaveBtn">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>334</y>
+     <x>491</x>
+     <y>330</y>
      <width>60</width>
      <height>60</height>
     </rect>
@@ -38,28 +38,6 @@
    </property>
    <property name="text">
     <string extracomment="start autobackup"/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>60</width>
-     <height>60</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pauseButton">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>334</y>
-     <width>60</width>
-     <height>60</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>停止自动保存</string>
-   </property>
-   <property name="text">
-    <string extracomment="pause autobackup"/>
    </property>
    <property name="iconSize">
     <size>
@@ -112,28 +90,6 @@
     <string extracomment="quick backup">QS</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="addBkButton">
-   <property name="geometry">
-    <rect>
-     <x>33</x>
-     <y>30</y>
-     <width>91</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑 Light</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="toolTip">
-    <string>add a new file path</string>
-   </property>
-   <property name="text">
-    <string>+新存档</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="quickLoadBtn">
    <property name="geometry">
     <rect>
@@ -154,50 +110,6 @@
    </property>
    <property name="text">
     <string extracomment="quick rollback">QL</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="saveButton">
-   <property name="geometry">
-    <rect>
-     <x>153</x>
-     <y>30</y>
-     <width>91</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑 Light</family>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="toolTip">
-    <string>save configs</string>
-   </property>
-   <property name="text">
-    <string>保存设置</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="settingsBtn">
-   <property name="geometry">
-    <rect>
-     <x>353</x>
-     <y>223</y>
-     <width>41</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>settings</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>26</width>
-     <height>26</height>
-    </size>
    </property>
   </widget>
   <widget class="QListWidget" name="backupFileList">
@@ -229,28 +141,6 @@
     <size>
      <width>121</width>
      <height>121</height>
-    </size>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="flushBtn">
-   <property name="geometry">
-    <rect>
-     <x>354</x>
-     <y>275</y>
-     <width>41</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>settings</string>
-   </property>
-   <property name="text">
-    <string>Flush</string>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>26</width>
-     <height>26</height>
     </size>
    </property>
   </widget>

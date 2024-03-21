@@ -53,8 +53,8 @@ private:
 	void initLogger();
 	void initButtonIcon();
 	void showMsg(const QString& message);
+	void update_autoSaveBtnStat();
 	void update_backupItemList();
-	void update_autoBackupButtonStat();
 	void update_backupFileList();
 	void callBackupItemDeleteDialog(QListWidgetItem* item);
 	bool check_backupValid();

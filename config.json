@@ -1,14 +1,18 @@
 {
     "AutobackupConfigs": {
-        "AutobackupEnabled": false,
         "AutobackupPeriod": 30,
-        "LastSelectedItem": 0
+        "LastSelectedItem": -1
     },
     "BackupList": [
         {
-            "backup_path": "E:/testfolder/case_backupfolder",
-            "name": "dddd啊s",
-            "source_path": "E:/testfolder/case_folder/case_save"
+            "backup_path": "E:/_testfolder/case_backupfolder",
+            "name": "阿米诺斯",
+            "source_path": "E:/_testfolder/case_folder/case_save"
+        },
+        {
+            "backup_path": "E:/_testfolder/minecraft1.19.4Folder",
+            "name": "mc",
+            "source_path": "E:/stuff/HMCL/.minecraft/versions/1.19.4 fabric/saves/backup world"
         }
     ],
     "Version": "1.0.0"

@@ -66,6 +66,7 @@
   <ItemGroup>
     <ClCompile Include="AddBkDialog.cpp" />
     <ClCompile Include="BKMWidget.cpp" />
+    <ClCompile Include="CompressHandler.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SaveDialog.cpp" />
@@ -80,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Logger.h" />
+    <ClInclude Include="CompressHandler.h" />
     <ClInclude Include="QWidgetTool.h" />
     <ClInclude Include="StdStrTool.h" />
     <ClInclude Include="ThreadPool.h" />

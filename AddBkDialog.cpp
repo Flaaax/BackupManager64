@@ -5,32 +5,11 @@
 #include <qmessagebox.h>
 
 namespace fs = std::filesystem;
-static const QRegExp invalidCharsRegExp("[<>:\"/\\\\|?*.]");
 
-/*
-static bool containsNonAscii(const QString& string)
-{
-	for (QChar ch : string) {
-		if (ch.unicode() > 127) {
-			return true;
-		}
-	}
-	return false;
-}
-*/
 
 static bool isFileNameValid(const QString& fileName)
 {
-	if (fileName.length() >= 10) {
-		return false;
-	}
-	if (fileName.contains(invalidCharsRegExp)) {
-		return false;
-	}
-	//if (containsNonAscii(fileName)) {
-	//	return false;
-	//}
-	return true;
+	return !(fileName.length() >= 30) && !fileName.contains(QRegExp("[<>:\"/\\\\|?*.]"));
 }
 
 
