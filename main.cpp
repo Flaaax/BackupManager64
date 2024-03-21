@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <windows.h>
 
-bool CheckRuntime()
+static bool check_runtime()
 {
 	// 尝试加载vcruntime140.dll或其他必要的DLL
 	HMODULE hMod = LoadLibrary(TEXT("vcruntime140.dll"));

@@ -1,19 +1,27 @@
 {
-    "AutobackupConfigs": {
-        "AutobackupPeriod": 30,
-        "LastSelectedItem": -1
+    "autosave_configs": {
+        "last_selected": 2,
+        "period": 30
     },
-    "BackupList": [
+    "backup_items": [
         {
-            "backup_path": "E:/_testfolder/case_backupfolder",
-            "name": "阿米诺斯",
+            "backup_path": "E:/_testfolder/test2",
+            "is_compress": true,
+            "name": "compress",
             "source_path": "E:/_testfolder/case_folder/case_save"
         },
         {
-            "backup_path": "E:/_testfolder/minecraft1.19.4Folder",
-            "name": "mc",
-            "source_path": "E:/stuff/HMCL/.minecraft/versions/1.19.4 fabric/saves/backup world"
+            "backup_path": "E:/_testfolder/case_backupfolder",
+            "is_compress": false,
+            "name": "中文名",
+            "source_path": "E:/_testfolder/case_folder/case_save"
+        },
+        {
+            "backup_path": "E:/_testfolder/中文存档",
+            "is_compress": true,
+            "name": "中午测试",
+            "source_path": "E:/_testfolder/case_folder/中文文件夹"
         }
     ],
-    "Version": "1.0.0"
+    "version": "1.1.0"
 }

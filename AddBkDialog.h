@@ -20,7 +20,7 @@ private slots:
 	bool onFinish_backupNameEdit();
 
 private:
-	void showMessage();
+	void updateMessage();
 	Ui::AddBkDialogClass* ui = new Ui::AddBkDialogClass;
 };
 

@@ -33,7 +33,7 @@
   <widget class="QLineEdit" name="sourcePathEdit">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>83</x>
      <y>40</y>
      <width>270</width>
      <height>25</height>
@@ -51,8 +51,8 @@
   <widget class="QLineEdit" name="backupPathEdit">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>100</y>
+     <x>83</x>
+     <y>86</y>
      <width>270</width>
      <height>25</height>
     </rect>
@@ -69,7 +69,7 @@
   <widget class="QPushButton" name="browseSourceButton">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>353</x>
      <y>40</y>
      <width>31</width>
      <height>23</height>
@@ -85,8 +85,8 @@
   <widget class="QPushButton" name="browseBackupButton">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>100</y>
+     <x>353</x>
+     <y>86</y>
      <width>31</width>
      <height>23</height>
     </rect>
@@ -101,8 +101,8 @@
   <widget class="QLineEdit" name="backupNameEdit">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>160</y>
+     <x>83</x>
+     <y>131</y>
      <width>144</width>
      <height>25</height>
     </rect>
@@ -119,8 +119,8 @@
   <widget class="QLabel" name="label_1">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>10</y>
+     <x>14</x>
+     <y>39</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -138,8 +138,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>71</y>
+     <x>6</x>
+     <y>86</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -157,9 +157,9 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>131</y>
-     <width>241</width>
+     <x>22</x>
+     <y>130</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -176,7 +176,7 @@
   <widget class="QPushButton" name="okButton">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>80</x>
      <y>230</y>
      <width>91</width>
      <height>31</height>
@@ -189,7 +189,7 @@
     </font>
    </property>
    <property name="text">
-    <string>确认</string>
+    <string>添加</string>
    </property>
   </widget>
   <widget class="QPushButton" name="cancelButton">
@@ -214,8 +214,8 @@
   <widget class="QLabel" name="bkNameValid_label">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>161</y>
+     <x>240</x>
+     <y>132</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -235,14 +235,35 @@
   <widget class="QLabel" name="messageLabel">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>195</y>
+     <x>84</x>
+     <y>201</y>
      <width>311</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
     <string>将会保存save1至backup1</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="checkCompressBtn">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>84</x>
+     <y>174</y>
+     <width>231</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>压缩存档文件</string>
    </property>
   </widget>
  </widget>

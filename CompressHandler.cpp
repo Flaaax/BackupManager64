@@ -28,12 +28,13 @@ void CompressHandler::compress(const std::filesystem::path& sourcePath, const st
     if (fs::is_directory(sourcePath)) {
         for (const auto& entry : fs::recursive_directory_iterator(sourcePath)) {
             if (fs::is_regular_file(entry.path())) {
-                addToArchive(a, entry.path());
+                fs::path relativePath = fs::relative(entry.path(), sourcePath.parent_path());
+                addToArchive(a, entry.path(), relativePath);
             }
         }
     }
     else if (fs::is_regular_file(sourcePath)) {
-        addToArchive(a, sourcePath);
+        addToArchive(a, sourcePath,sourcePath.filename());
     }
     else {
         Logger::log("source is neither directory nor regular file");
@@ -45,54 +46,59 @@ void CompressHandler::compress(const std::filesystem::path& sourcePath, const st
 
 void CompressHandler::extract(const std::filesystem::path& archivePath, const std::filesystem::path& targetDir)
 {
-    archive* a;
-    archive_entry* entry;
-    int r;
+    try {
+        archive* a;
+        archive_entry* entry;
+        int r;
 
-    a = archive_read_new();
-    archive_read_support_filter_zstd(a);
-    archive_read_support_format_tar(a);
+        a = archive_read_new();
+        archive_read_support_filter_zstd(a);
+        archive_read_support_format_tar(a);
 
-    r = archive_read_open_filename(a, archivePath.string().c_str(), 10240); // Note: Buffer size is 10240
-    if (r != ARCHIVE_OK) {
-        Logger::fatal("failed to open archive objects");
-    }
-
-    while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        fs::path filePath = targetDir / archive_entry_pathname(entry);
-        if (archive_entry_filetype(entry) == AE_IFDIR) {
-            fs::create_directories(filePath);
+        r = archive_read_open_filename(a, archivePath.string().c_str(), 10240); // Note: Buffer size is 10240
+        if (r != ARCHIVE_OK) {
+            Logger::fatal("failed to open archive objects");
         }
-        else {
-            fs::create_directories(filePath.parent_path());
-            std::ofstream file(filePath, std::ios::binary);
-            const void* buff;
-            size_t size;
-            la_int64_t offset;
 
-            while (archive_read_data_block(a, &buff, &size, &offset) == ARCHIVE_OK) {
-                file.write(reinterpret_cast<const char*>(buff), size);
+        while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+            fs::path filePath = targetDir / archive_entry_pathname(entry);
+            if (archive_entry_filetype(entry) == AE_IFDIR) {
+                fs::create_directories(filePath);
+            }
+            else {
+                fs::create_directories(filePath.parent_path());
+                std::ofstream file(filePath, std::ios::binary);
+                const void* buff;
+                size_t size;
+                la_int64_t offset;
+
+                while (archive_read_data_block(a, &buff, &size, &offset) == ARCHIVE_OK) {
+                    file.write(reinterpret_cast<const char*>(buff), size);
+                }
             }
         }
-    }
 
-    r = archive_read_free(a);
-    if (r != ARCHIVE_OK) {
-        Logger::fatal("failed to free archive objects");
+        r = archive_read_free(a);
+        if (r != ARCHIVE_OK) {
+            Logger::fatal("failed to free archive objects");
+        }
+    }
+    catch (std::exception& e) {
+        Logger::warning(e.what());
     }
 }
 
-void CompressHandler::addToArchive(archive* a, const std::filesystem::path& filePath)
+void CompressHandler::addToArchive(archive* a, const std::filesystem::path& filePath, const std::filesystem::path& relativePath)
 {
     archive_entry* entry = archive_entry_new();
-    archive_entry_set_pathname(entry, filePath.string().c_str());
+    archive_entry_set_pathname(entry, relativePath.string().c_str()); // 使用相对路径
     archive_entry_set_size(entry, fs::file_size(filePath));
     archive_entry_set_filetype(entry, AE_IFREG);
     archive_entry_set_perm(entry, 0644);
     archive_write_header(a, entry);
 
     std::ifstream file(filePath, std::ios::binary);
-    static char buffer[8192];                         //not multithread friendly
+    static char buffer[8192];
     while (file.read(buffer, sizeof(buffer))) {
         archive_write_data(a, buffer, file.gcount());
     }

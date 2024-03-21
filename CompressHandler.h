@@ -12,6 +12,6 @@ public:
     static void extract(const std::filesystem::path& archivePath, const std::filesystem::path& targetDir);
 
 private:
-    static void addToArchive(struct archive* a, const std::filesystem::path& filePath);
+    static void addToArchive(struct archive* a, const std::filesystem::path& filePath,const std::filesystem::path& relativePath);
 };
 

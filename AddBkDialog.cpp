@@ -39,11 +39,10 @@ AddBkDialog::AddBkDialog(QWidget* parent, BackupItem item) :QDialog(parent)
 BackupItem AddBkDialog::getUserInput() const
 {
 	BackupItem newItem{
-		// 使用.toStdWString()确保路径字符串是宽字符格式
 		std::filesystem::path(ui->sourcePathEdit->text().toStdWString()),
 		std::filesystem::path(ui->backupPathEdit->text().toStdWString()),
-		// 如果备份名不是路径，可以使用.toStdString()，否则也应使用.toStdWString()
-		ui->backupNameEdit->text().toStdWString()
+		ui->backupNameEdit->text().toStdWString(),
+		ui->checkCompressBtn->isChecked()
 	};
 	return newItem;
 }
@@ -53,7 +52,7 @@ void AddBkDialog::onClick_browseSourceButton()
 	QString directory = QFileDialog::getExistingDirectory(this, tr("选择源文件路径"), "C:\\");
 	if (!directory.isEmpty()) {
 		ui->sourcePathEdit->setText(directory);
-		showMessage();
+		updateMessage();
 	}
 }
 
@@ -62,7 +61,7 @@ void AddBkDialog::onClick_browseBackupButton()
 	QString directory = QFileDialog::getExistingDirectory(this, tr("选择存档路径"), "C:\\");		//QDir::homepath()
 	if (!directory.isEmpty()) {
 		ui->backupPathEdit->setText(directory);
-		showMessage();
+		updateMessage();
 	}
 }
 
@@ -107,14 +106,14 @@ bool AddBkDialog::onFinish_backupNameEdit()
 	}
 }
 
-void AddBkDialog::showMessage()
+void AddBkDialog::updateMessage()
 {
 	auto source_path = std::filesystem::u8path(ui->sourcePathEdit->text().toUtf8().constData());
 	auto backup_path = std::filesystem::u8path(ui->backupPathEdit->text().toUtf8().constData());
 	auto source_folder = source_path.filename();
 	auto backup_folder = backup_path.filename();
 	QString messageText = "将会在 "
-		+ QString::fromUtf8(reinterpret_cast<const char*>(backup_folder.u8string().c_str()))
-		+ " 中创建 " + QString::fromUtf8(reinterpret_cast<const char*>(source_folder.u8string().c_str())) + " 的存档";
+		+ QString::fromStdWString(backup_folder.wstring())
+		+ " 中创建 " + QString::fromStdWString(source_folder.wstring()) + " 的存档";
 	ui->messageLabel->setText(messageText);
 }

@@ -91,6 +91,7 @@ void BKMWidget::addNewBackupItem()
 		bkManager.addBackup(newDialog.getUserInput());
 		update_backupItemList();
 		showMsg("添加存档成功");
+		bkManager.saveAll();
 	}
 }
 
