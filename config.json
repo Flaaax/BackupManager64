@@ -1,6 +1,6 @@
 {
     "autosave_configs": {
-        "last_selected": 2,
+        "last_selected": 1,
         "period": 30
     },
     "backup_items": [
@@ -11,15 +11,9 @@
             "source_path": "E:/_testfolder/case_folder/case_save"
         },
         {
-            "backup_path": "E:/_testfolder/case_backupfolder",
-            "is_compress": false,
-            "name": "中文名",
-            "source_path": "E:/_testfolder/case_folder/case_save"
-        },
-        {
             "backup_path": "E:/_testfolder/中文存档",
             "is_compress": true,
-            "name": "中午测试",
+            "name": "中文存档",
             "source_path": "E:/_testfolder/case_folder/中文文件夹"
         }
     ],

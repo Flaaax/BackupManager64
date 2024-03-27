@@ -5,7 +5,6 @@
 #include <qmutex.h>
 
 
-//todo maybe add func like debug()
 class Logger :public QObject
 {
 	Q_OBJECT
@@ -62,3 +61,6 @@ private:
 	Logger() {}
 };
 
+class FileLogger {
+	//todo
+};

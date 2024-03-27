@@ -4,9 +4,10 @@
 #include <codecvt>
 #include <qstring.h>
 
-class StdStrTool
+class StrHelper
 {
 public:
+
 	static std::wstring toWstring(const std::string& str)
 	{
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -27,6 +28,11 @@ public:
 	static std::string toStdString(const std::u8string& s)
 	{
 		return std::string(reinterpret_cast<const char*>(s.data()), s.size());
+	}
+
+	static QString toQString(const std::filesystem::path& str)
+	{
+		return QString::fromStdWString(str.wstring());
 	}
 };
 

@@ -309,7 +309,6 @@ void BKMWidget::handleQSQL(Action action)
 			return;
 		}
 		int index = ui->backupFileList->currentRow();
-		//todo 加入回档确认选项
 		if (index == -1)index = 0;
 		if (index >= 0 && index <= backups.size() - 1) {
 			QString name = QString::fromStdWString(backups[index].first.filename().wstring());

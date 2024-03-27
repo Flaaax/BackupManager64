@@ -1,7 +1,6 @@
 #include "SettingsDialog.h"
 #include <qtimer.h>
 
-//todo 想办法在点击输入框后选中所有内容
 SettingsDialog::SettingsDialog(QWidget* parent, const BackupConfig& currentConfigs):QDialog(parent)
 {
 	ui->setupUi(this);
