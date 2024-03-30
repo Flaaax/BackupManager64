@@ -135,7 +135,7 @@ void CompressHandler::compress(const std::filesystem::path& sourcePath, const st
 
 	auto targetName = StrHelper::toQString(sourcePath.filename());
 
-	auto arg1 = StrHelper::toQString(targetDir) + "\\" + targetName + ".7z";
+	auto arg1 = StrHelper::toQString(targetDir) + "\\" + targetName + COMP_EXT;
 
 	if (fs::is_directory(sourcePath)) {
 		arguments << "a" << arg1 << StrHelper::toQString(sourcePath).append("\\*") << "-r";
@@ -190,4 +190,9 @@ void CompressHandler::extract(const std::filesystem::path& archivePath, const st
 		return;
 	}
 
+}
+
+bool CompressHandler::isRegularCompFile(const std::filesystem::path& path)
+{
+	return fs::is_regular_file(path) && path.extension() == COMP_EXT;
 }

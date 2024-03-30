@@ -25,6 +25,9 @@ AddBkDialog::AddBkDialog(QWidget* parent, BackupItem item) :QDialog(parent)
 		ui->backupNameEdit->setText(QString::fromStdWString(item.name));
 		ui->backupPathEdit->setText(QString::fromStdWString(item.backup_path.wstring()));
 		ui->sourcePathEdit->setText(QString::fromStdWString(item.source_path.wstring()));
+		ui->checkCompressBtn->setChecked(item.isCompress);
+		ui->checkCompressBtn->setEnabled(false);
+		ui->okButton->setText(tr("±£´æ"));
 	}
 	ui->bkNameValid_label->setStyleSheet("QLabel { color : red; }");
 	ui->bkNameValid_label->clear();

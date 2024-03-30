@@ -88,16 +88,16 @@ void BKMWidget::addNewBackupItem()
 {
 	AddBkDialog newDialog(this);
 	if (newDialog.exec() == QDialog::Accepted) {
-		bkManager.addBackup(newDialog.getUserInput());
+		bkManager.addBackupItem(newDialog.getUserInput());
 		update_backupItemList();
 		showMsg("添加存档成功");
-		bkManager.saveAll();
+		bkManager.saveConfigs();
 	}
 }
 
 void BKMWidget::saveConfigs()
 {
-	bkManager.saveAll();
+	bkManager.saveConfigs();
 	showMsg("保存成功");
 }
 
@@ -166,23 +166,23 @@ void BKMWidget::callMenu_backupItemList(const QPoint& pos)
 			callBackupItemDeleteDialog(item);
 		}
 		else if (selectedAction == browseSourceAction) {
-			QString sourcePath = QString::fromStdString(bkManager.getBackup(index).source_path.string());
+			QString sourcePath = QString::fromStdString(bkManager.getBackupItem(index).source_path.string());
 			QDesktopServices::openUrl(QUrl::fromLocalFile(sourcePath));
 		}
 		else if (selectedAction == browseBackupAction) {
-			QString backupPath = QString::fromStdString(bkManager.getBackup(index).backup_path.string());
+			QString backupPath = QString::fromStdString(bkManager.getBackupItem(index).backup_path.string());
 			QDesktopServices::openUrl(QUrl::fromLocalFile(backupPath));
 		}
 		else if (selectedAction == removeAction) {
 			bkManager.removeBackupItem(index, false);
-			bkManager.saveAll();
+			bkManager.saveConfigs();
 			update_backupItemList();
 		}
 		else if (selectedAction == editAction) {
-			AddBkDialog newDialog(this, bkManager.getBackup(index));
+			AddBkDialog newDialog(this, bkManager.getBackupItem(index));
 			int res = newDialog.exec();
 			if (res == QDialog::Accepted) {
-				bkManager.editBackup(newDialog.getUserInput(), index);
+				bkManager.editBackupItem(newDialog.getUserInput(), index);
 			}
 			update_backupItemList();
 		}
@@ -195,11 +195,11 @@ void BKMWidget::callMenu_backupItemList(const QPoint& pos)
 			else if (selectedAction == moveUpAction && index - 1 >= 0) {
 				next_index = index - 1;
 			}
-			else if (selectedAction == moveDownAction && static_cast<unsigned long long>(index + 1) <= bkManager.getSize() - 1) {
+			else if (selectedAction == moveDownAction && static_cast<unsigned long long>(index + 1) <= bkManager.getItemsCount() - 1) {
 				next_index = index + 1;
 			}
 			if (next_index != -1) {
-				bkManager.swapBackups(index, next_index);
+				bkManager.swapBackupItems(index, next_index);
 				update_backupItemList();
 				ui->backupItemList->setCurrentRow(next_index);
 			}
@@ -263,7 +263,7 @@ void BKMWidget::handleQSQL(Action action)
 		this->showMsg("你点的太快了");
 		return;
 	}
-	if (bkManager.getBackup(BackupManagerQt::CURRENT).empty()) {
+	if (bkManager.getBackupItem(BackupManagerQt::CURRENT).empty()) {
 		QApplication::beep();
 		this->showMsg("未选中存档文件");
 		return;
@@ -352,10 +352,10 @@ void BKMWidget::initMenuBar()
 		auto items = QWidgetTool::checkedItems(ui->backupItemList);
 		if (!items.empty()) {
 			auto index = ui->backupItemList->row(items.front());
-			AddBkDialog newDialog(this, bkManager.getBackup(index));
+			AddBkDialog newDialog(this, bkManager.getBackupItem(index));
 			int res = newDialog.exec();
 			if (res == QDialog::Accepted) {
-				bkManager.editBackup(newDialog.getUserInput(), index);
+				bkManager.editBackupItem(newDialog.getUserInput(), index);
 			}
 			refresh();
 		}
@@ -364,7 +364,15 @@ void BKMWidget::initMenuBar()
 		}
 	});
 	auto compressMenu = fileMenu->addMenu("Compress..");
-	connect(compressMenu->addAction("Compress"), &QAction::triggered, [this]() {Logger::info("Unsupported action..."); });
+	connect(compressMenu->addAction("Switch to Compress"), &QAction::triggered, [this]() {
+		auto items = QWidgetTool::checkedItems(ui->backupItemList);
+		if (!items.empty()) {
+			bkManager.turnItemToComp(ui->backupItemList->row(items.front()));
+		}
+		else {
+			showMsg("请勾选一个存档");
+		}
+	});
 	connect(compressMenu->addAction("Decompress"), &QAction::triggered, [this]() {Logger::info("Unsupported action..."); });
 	connect(fileMenu->addAction("Quit"), &QAction::triggered, [this] {this->close(); });
 
@@ -464,9 +472,9 @@ void BKMWidget::update_backupItemList()
 {
 	ui->backupItemList->blockSignals(true);
 	ui->backupItemList->clear();
-	if (bkManager.getSize() > 0) {
-		for (int index = 0; index < bkManager.getSize(); index++) {
-			QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackup(index).name), ui->backupItemList);
+	if (bkManager.getItemsCount() > 0) {
+		for (int index = 0; index < bkManager.getItemsCount(); index++) {
+			QListWidgetItem* item = new QListWidgetItem(QString::fromStdWString(bkManager.getBackupItem(index).name), ui->backupItemList);
 			item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 			if (index == bkManager.getConfigs().currentItem) {
 				item->setCheckState(Qt::Checked);
@@ -530,7 +538,7 @@ void BKMWidget::update_backupFileList()
 	ui->backupFileList->clear();
 	auto backups = bkManager.getAllBackups();
 	//int currentItem = bkManager.getConfigs().currentItem;
-	//QString name = QString::fromStdString(bkManager.getBackup(currentItem).name);
+	//QString name = QString::fromStdString(bkManager.getBackupItem(currentItem).name);
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
 			QListWidgetItem* item = new QListWidgetItem(ui->backupFileList);
@@ -549,10 +557,10 @@ void BKMWidget::update_backupFileList()
 
 bool BKMWidget::check_backupValid()
 {
-	if (bkManager.isBackupValid(BackupManagerQt::ALL)) {
+	if (bkManager.isBackupItemValid(BackupManagerQt::ALL)) {
 		QMessageBox msg(this);
 		msg.setWindowTitle("错误");
-		QString text = "存档 " + QString::fromStdWString(bkManager.getBackup().name) + " 找不到路径，\n或者路径被修改";
+		QString text = "存档 " + QString::fromStdWString(bkManager.getBackupItem().name) + " 找不到路径，\n或者路径被修改";
 		msg.setText(text);
 		QPushButton* btn = msg.addButton(tr("确定"), QMessageBox::AcceptRole);
 		msg.exec();
@@ -594,9 +602,9 @@ void BKMWidget::callBackupItemDeleteDialog(QListWidgetItem* item)
 		bkManager.removeBackupItem(index, true);
 		QMessageBox msg;
 		msg.setWindowTitle("调试消息");
-		msg.setText("测试版本中，没有任何存档被删除，请自行手动删除");
+		msg.setText("测试版本中无法直接删除所有存档文件");
 		msg.exec();
 	}
-	bkManager.saveAll();
+	bkManager.saveConfigs();
 	update_backupItemList();
 }

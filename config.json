@@ -11,10 +11,10 @@
             "source_path": "E:/_testfolder/case_folder/case_save"
         },
         {
-            "backup_path": "E:/_testfolder/中文存档",
+            "backup_path": "E:/_testfolder/_comp_test",
             "is_compress": true,
-            "name": "中文存档",
-            "source_path": "E:/_testfolder/case_folder/中文文件夹"
+            "name": "test",
+            "source_path": "E:/_testfolder/case_folder/新建文件夹"
         }
     ],
     "version": "1.1.0"

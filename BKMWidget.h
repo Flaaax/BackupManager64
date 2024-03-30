@@ -10,6 +10,7 @@
 //todo 优化右键菜单，添加属性栏目
 //todo 在存档列表加入更多存档信息（如显示存档数量）
 //todo 添加文件日志系统（如果有必要）
+//todo 默认存档只显示 月份，日期，小时，分钟
 //主界面
 class BKMWidget : public QWidget
 {
@@ -24,7 +25,7 @@ public:
 	};
 
 	BKMWidget(QWidget* parent = nullptr);
-	~BKMWidget() { bkManager.saveAll();}					//dont need to delete ui
+	~BKMWidget() { bkManager.saveConfigs();}					//dont need to delete ui
 
 private slots:
 
