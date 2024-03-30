@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
-    <height>440</height>
+    <width>548</width>
+    <height>428</height>
    </rect>
   </property>
   <property name="font">
@@ -24,7 +24,7 @@
   <widget class="QPushButton" name="autoSaveBtn">
    <property name="geometry">
     <rect>
-     <x>491</x>
+     <x>460</x>
      <y>330</y>
      <width>60</width>
      <height>60</height>
@@ -49,10 +49,10 @@
   <widget class="QListWidget" name="backupItemList">
    <property name="geometry">
     <rect>
-     <x>32</x>
-     <y>72</y>
-     <width>131</width>
-     <height>121</height>
+     <x>20</x>
+     <y>50</y>
+     <width>140</width>
+     <height>140</height>
     </rect>
    </property>
    <property name="dragEnabled">
@@ -71,8 +71,8 @@
   <widget class="QPushButton" name="quickSaveBtn">
    <property name="geometry">
     <rect>
-     <x>401</x>
-     <y>276</y>
+     <x>360</x>
+     <y>270</y>
      <width>103</width>
      <height>41</height>
     </rect>
@@ -93,8 +93,8 @@
   <widget class="QPushButton" name="quickLoadBtn">
    <property name="geometry">
     <rect>
-     <x>401</x>
-     <y>223</y>
+     <x>360</x>
+     <y>220</y>
      <width>103</width>
      <height>41</height>
     </rect>
@@ -115,9 +115,9 @@
   <widget class="QListWidget" name="backupFileList">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>215</y>
-     <width>311</width>
+     <x>20</x>
+     <y>210</y>
+     <width>291</width>
      <height>191</height>
     </rect>
    </property>
@@ -128,8 +128,8 @@
   <widget class="QPushButton" name="myPicture">
    <property name="geometry">
     <rect>
-     <x>165</x>
-     <y>72</y>
+     <x>530</x>
+     <y>400</y>
      <width>121</width>
      <height>121</height>
     </rect>
@@ -147,8 +147,8 @@
   <widget class="QPushButton" name="saveBtn">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>276</y>
+     <x>480</x>
+     <y>270</y>
      <width>41</width>
      <height>41</height>
     </rect>
@@ -169,8 +169,8 @@
   <widget class="QPushButton" name="loadBtn">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>224</y>
+     <x>480</x>
+     <y>220</y>
      <width>41</width>
      <height>41</height>
     </rect>
@@ -191,10 +191,10 @@
   <widget class="QPlainTextEdit" name="loggerEdit">
    <property name="geometry">
     <rect>
-     <x>288</x>
-     <y>72</y>
-     <width>265</width>
-     <height>121</height>
+     <x>190</x>
+     <y>50</y>
+     <width>331</width>
+     <height>141</height>
     </rect>
    </property>
   </widget>

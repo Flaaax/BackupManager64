@@ -50,13 +50,17 @@ static QWidget* createAllbkListItem(const std::filesystem::path& filepath)
 BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 {
 	ui->setupUi(this);
+
 	this->bkManager.setGeneralCallback([this](bool stat) {Logger::instance().update(stat); });
+
 	this->initLogger();
-	this->setFixedSize(585, 440);
+	this->initButtonIcon();
+	this->initMenuBar();
+
+	this->setFixedSize(this->size());
 	std::string version = ConfigHelper::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
 	this->setWindowTitle(title);
-	this->initButtonIcon();
 	ui->backupItemList->setSortingEnabled(false);
 	ui->backupItemList->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->backupFileList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -78,8 +82,6 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	connect(ui->backupItemList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_backupItemList);
 	connect(ui->backupFileList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_backupFileList);
 	this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
-
-	this->initMenuBar();
 
 	this->refresh();
 }
@@ -466,6 +468,7 @@ void BKMWidget::initButtonIcon()
 	//ui->pauseButton->setIconSize(QSize(60, 60));
 	ui->myPicture->setIcon(QIcon("resources//wha.png"));
 	ui->myPicture->setIconSize(QSize(121, 121));
+	ui->myPicture->setVisible(false);
 	/*
 	ui->moveBtn_down->setIcon(QIcon("resources//black_arrow2.png"));
 	ui->moveBtn_down->setIconSize(QSize(25, 25));
