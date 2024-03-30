@@ -100,9 +100,6 @@
     <QtMoc Include="BKMWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="SettingsDialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="AddBkDialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -111,6 +108,9 @@
     </QtMoc>
     <QtMoc Include="Logger.h">
       <Filter>Header Files\Utils</Filter>
+    </QtMoc>
+    <QtMoc Include="SettingsDialog.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

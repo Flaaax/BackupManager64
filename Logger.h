@@ -22,7 +22,7 @@ public:
 
 	static bool debugMode;
 
-	static Logger& instance()
+	static inline Logger& instance()
 	{
 		static Logger instance;
 		return instance;
@@ -35,8 +35,7 @@ public:
 	void append(const std::wstring& msg);
 	void append(const std::string& msg);
 	void append(const char* msg);
-	void installWidgetLogger();
-	void installFileLogger();
+	void installGlobalLogger();
 	void update(bool stat);
 
 	static void log(const QString& msg, LogType type = LOG);
@@ -49,6 +48,8 @@ public:
 	static void fatal(const QString& msg);
 	static void info(const QString& msg);
 	static void critical(const QString& msg);
+	
+	static bool checkErrorCode(const QString& msg);		//check chinese, ascii, japanese
 
 signals:
 	void messageRequest(const QString& msg);
@@ -57,10 +58,16 @@ signals:
 
 private:
 	static void customLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg);
-	static void fileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 	Logger() {}
 };
 
 class FileLogger {
-	//todo
+public:
+	static constexpr auto LOG_FILE = "log.txt";
+
+	static void installGlobalLogger();
+	static void log(const QString& msg);
+
+private:
+	static void customLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 };

@@ -22,7 +22,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>181</y>
+     <y>174</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -41,7 +41,7 @@
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>181</y>
+     <y>174</y>
      <width>91</width>
      <height>31</height>
     </rect>
@@ -59,8 +59,8 @@
   <widget class="QLineEdit" name="autobkPeriodEd">
    <property name="geometry">
     <rect>
-     <x>93</x>
-     <y>118</y>
+     <x>104</x>
+     <y>105</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -75,30 +75,11 @@
     <string>30</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="autobkEnableBtn">
-   <property name="geometry">
-    <rect>
-     <x>92</x>
-     <y>40</y>
-     <width>241</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>微软雅黑 Light</family>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>打开时启用自动保存</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>92</x>
-     <y>86</y>
+     <x>103</x>
+     <y>73</y>
      <width>201</width>
      <height>21</height>
     </rect>
@@ -116,8 +97,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>209</x>
-     <y>118</y>
+     <x>220</x>
+     <y>105</y>
      <width>72</width>
      <height>21</height>
     </rect>

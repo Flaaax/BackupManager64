@@ -258,7 +258,7 @@ void BKMWidget::handleQSQL(Action action)
 {
 	static qint64 lastClickTime = 0;
 	qint64 now = QDateTime::currentMSecsSinceEpoch();
-	if (now - lastClickTime < 2000) {
+	if (now - lastClickTime < MIN_CLICK_DUR) {
 		QApplication::beep();
 		this->showMsg("你点的太快了");
 		return;
@@ -373,7 +373,15 @@ void BKMWidget::initMenuBar()
 			showMsg("请勾选一个存档");
 		}
 	});
-	connect(compressMenu->addAction("Decompress"), &QAction::triggered, [this]() {Logger::info("Unsupported action..."); });
+	connect(compressMenu->addAction("Switch to Normal"), &QAction::triggered, [this]() {
+		auto items = QWidgetTool::checkedItems(ui->backupItemList);
+		if (!items.empty()) {
+			bkManager.turnItemToNorm(ui->backupItemList->row(items.front()));
+		}
+		else {
+			showMsg("请勾选一个存档");
+		}
+	});
 	connect(fileMenu->addAction("Quit"), &QAction::triggered, [this] {this->close(); });
 
 	auto editMenu = menuBar->addMenu("Backup");
@@ -446,7 +454,7 @@ void BKMWidget::initLogger()
 		}
 	});
 	connect(&Logger::instance(), &Logger::updateRequest, this, &BKMWidget::refresh);
-	Logger::instance().installWidgetLogger();
+	Logger::instance().installGlobalLogger();
 	Logger::debug("loggerEdit successfully set");
 }
 

@@ -31,6 +31,22 @@ void Logger::update(bool stat)
 	emit updateRequest(stat);
 }
 
+bool Logger::checkErrorCode(const QString& msg)
+{
+	for (int i = 0; i < msg.size(); ++i) {
+		ushort code = msg[i].unicode();
+		if (!((code >= 0x0020 && code <= 0x007E)
+			  || (code >= 0x4E00 && code <= 0x9FFF)
+			  || (code >= 0x3040 && code <= 0x309F)
+			  || (code >= 0x30A0 && code <= 0x30FF)
+			  || (code == 0x3000)
+			  || (code >= 0xFF01 && code <= 0xFFEF))) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Logger::customLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
 	QByteArray localMsg = msg.toLocal8Bit();
@@ -51,19 +67,6 @@ void Logger::customLogger(QtMsgType type, const QMessageLogContext& context, con
 			instance().append(QString("Fatal: %1").arg(msg));
 			abort();
 	}
-}
-
-void Logger::fileLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-	QFile file("log.txt");
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-		QTextStream(stderr) << "Cannot open log file: " << file.errorString();
-		return;
-	}
-	QTextStream out(&file);
-	out << msg << "\n";
-	file.flush();
-	QTextStream(stderr) << msg << "\n";
 }
 
 void Logger::warning(const QString& msg)
@@ -96,7 +99,7 @@ void Logger::debug(const QString& msg)
 	Logger::log(msg, Logger::DEBUG);
 }
 
-void Logger::installWidgetLogger()
+void Logger::installGlobalLogger()
 {
 	qInstallMessageHandler(Logger::customLogger);
 }
@@ -121,13 +124,42 @@ void Logger::log(const QString& msg, LogType type)
 			break;
 		case LogType::FATAL:
 			Logger::instance().append("FATAL: " + msg);
+			FileLogger::log("FATAL: " + msg);
 			std::abort();			//program abort
 			break;
 		case LogType::ERR:
 			Logger::instance().append("ERROR: " + msg);
+			FileLogger::log("ERROR: " + msg);
 			throw std::runtime_error(msg.toStdString());
 			break;
 		default:
 			Logger::instance().append("Unkown: " + msg);
 	}
+	if (Logger::debugMode && Logger::checkErrorCode(msg)) {
+		Logger::instance().append("Warning: message might contain error code");
+	}
+}
+
+
+void FileLogger::customLogger(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+	FileLogger::log(msg);
+}
+
+void FileLogger::installGlobalLogger()
+{
+	qInstallMessageHandler(FileLogger::customLogger);
+}
+
+void FileLogger::log(const QString& msg)
+{
+	QFile file(LOG_FILE);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		QTextStream(stderr) << "Cannot open log file: " << file.errorString();
+		return;
+	}
+	QTextStream out(&file);
+	out << msg << "\n";
+	file.flush(); // 确保消息被写入文件
 }

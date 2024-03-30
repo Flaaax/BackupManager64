@@ -40,6 +40,7 @@ private slots:
 	void refresh();
 
 private:
+	static constexpr auto MIN_CLICK_DUR = 1000;
 
 	Ui::BKMWidgetClass* ui = new Ui::BKMWidgetClass;
 
