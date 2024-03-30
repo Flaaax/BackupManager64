@@ -23,6 +23,9 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{d182fd5f-a800-4ad1-8f39-5305468af662}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Binary Files">
+      <UniqueIdentifier>{e86cf81e-74b8-4320-b96e-bc24062d766f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="BackupManagerQt64.qrc">
@@ -126,5 +129,13 @@
     <QtUic Include="SaveDialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lib\7z.dll">
+      <Filter>Binary Files</Filter>
+    </None>
+    <None Include="lib\7z.exe">
+      <Filter>Binary Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

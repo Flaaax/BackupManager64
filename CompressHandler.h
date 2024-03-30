@@ -5,7 +5,7 @@
 class CompressHandler
 {
 public:
-	static constexpr auto EXE_PATH = "./bin/7z.exe";
+	static constexpr auto EXE_PATH = "./lib/7z.exe";
 	static constexpr auto COMP_EXT = ".7z";
 
 	static void compress(const std::filesystem::path& sourcePath, const std::filesystem::path& targetDir);

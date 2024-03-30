@@ -72,6 +72,8 @@
     <ClCompile Include="SaveDialog.cpp" />
     <ClCompile Include="SettingsDialog.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
+    <None Include="lib\7z.dll" />
+    <None Include="lib\7z.exe" />
     <QtRcc Include="BackupManagerQt64.qrc" />
     <ClCompile Include="BackupManager\BackupConfig.cpp" />
     <ClCompile Include="BackupManager\BackupManagerQt.cpp" />
