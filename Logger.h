@@ -45,6 +45,7 @@ public:
 	static void debug(const QString& msg);
 	static void warning(const QString& msg);
 	static void err(const QString& msg);
+	static void err(const std::exception& e);
 	static void fatal(const QString& msg);
 	static void info(const QString& msg);
 	static void critical(const QString& msg);

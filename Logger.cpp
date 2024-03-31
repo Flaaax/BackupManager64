@@ -94,6 +94,11 @@ void Logger::err(const QString& msg)
 	Logger::log(msg, Logger::ERR);
 }
 
+void Logger::err(const std::exception& e)
+{
+	Logger::err(e.what());
+}
+
 void Logger::debug(const QString& msg)
 {
 	Logger::log(msg, Logger::DEBUG);
@@ -130,7 +135,7 @@ void Logger::log(const QString& msg, LogType type)
 		case LogType::ERR:
 			Logger::instance().append("ERROR: " + msg);
 			FileLogger::log("ERROR: " + msg);
-			throw std::runtime_error(msg.toStdString());
+			//throw std::runtime_error(msg.toStdString());
 			break;
 		default:
 			Logger::instance().append("Unkown: " + msg);
