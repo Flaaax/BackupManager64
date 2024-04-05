@@ -84,6 +84,7 @@
   <ItemGroup>
     <QtMoc Include="Logger.h" />
     <ClInclude Include="CompressHandler.h" />
+    <ClInclude Include="IconManager.h" />
     <ClInclude Include="QWidgetTool.h" />
     <ClInclude Include="StdStrTool.h" />
     <ClInclude Include="ThreadPool.h" />

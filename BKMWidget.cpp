@@ -17,7 +17,9 @@
 #include <qtimer.h>
 #include <qurl.h>
 #include <qmenubar.h>
+#include <qgraphicsview.h>
 #include "QWidgetTool.h"
+#include "IconManager.h"
 
 
 namespace fs = std::filesystem;
@@ -54,19 +56,25 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	this->bkManager.setGeneralCallback([this](bool stat) {Logger::instance().update(stat); });
 
 	this->initLogger();
+	this->initBackupFileWidgets();
 	this->initButtonIcon();
 	this->initMenuBar();
 
 	this->setFixedSize(this->size());
+	this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
 	std::string version = ConfigHelper::loadVersion();
 	QString title = QString::fromStdString("BackupManager x64 v" + version);
 	this->setWindowTitle(title);
+
 	ui->backupItemList->setSortingEnabled(false);
 	ui->backupItemList->setContextMenuPolicy(Qt::CustomContextMenu);
-	ui->backupFileList->setContextMenuPolicy(Qt::CustomContextMenu);
+
+	backupFileList->setContextMenuPolicy(Qt::CustomContextMenu);
+
 	ui->backupItemList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
-	ui->backupFileList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
-	ui->loggerEdit->setStyleSheet("QListWidget { background-color: rgb(244,244,244); }");
+	backupFileList->setStyleSheet("QListWidget { background-color: rgb(250,250,250); }");
+	ui->loggerEdit->setStyleSheet("QPlainTextEdit { background-color: rgb(240,240,240); }");
+
 	//connect(ui->addBkButton, &QPushButton::clicked, this, &BKMWidget::addNewBackupItem);
 	//connect(ui->saveButton, &QPushButton::clicked, this, &BKMWidget::saveConfigs);
 	//connect(ui->settingsBtn, &QPushButton::clicked, this, &BKMWidget::openSettings);
@@ -80,8 +88,8 @@ BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent)
 	connect(ui->backupItemList, &QListWidget::itemChanged, this, &BKMWidget::onItemChange_bkNameList);
 	connect(ui->backupItemList, &QListWidget::itemChanged, this, &BKMWidget::update_backupFileList);
 	connect(ui->backupItemList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_backupItemList);
-	connect(ui->backupFileList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_backupFileList);
-	this->setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
+	connect(backupFileList, &QListWidget::customContextMenuRequested, this, &BKMWidget::callMenu_backupFileList);
+	connect(ui->branchModeBtn, &QPushButton::clicked, this, &BKMWidget::switchBackupDispMode);
 
 	this->refresh();
 }
@@ -211,15 +219,15 @@ void BKMWidget::callMenu_backupItemList(const QPoint& pos)
 
 void BKMWidget::callMenu_backupFileList(const QPoint& pos)
 {
-	QListWidgetItem* item = ui->backupFileList->itemAt(pos);
-	int index = ui->backupFileList->row(item);
+	QListWidgetItem* item = backupFileList->itemAt(pos);
+	int index = backupFileList->row(item);
 	auto backupFiles = bkManager.getAllBackups();
 	if (VectorTool::isValid(backupFiles, index)) {
 		QMenu menu;
 		QAction* copyAction = menu.addAction(tr("复制"));
 		QAction* deleteAction = menu.addAction(tr("删除"));
 		QAction* browseAction = menu.addAction(tr("浏览"));
-		QAction* selectedAction = menu.exec(ui->backupFileList->viewport()->mapToGlobal(pos));
+		QAction* selectedAction = menu.exec(backupFileList->viewport()->mapToGlobal(pos));
 		if (selectedAction == copyAction) {
 			bkManager.copyBackup(index);
 		}
@@ -240,9 +248,25 @@ void BKMWidget::refresh()
 {
 	static QMutex updateMtx;
 	QMutexLocker locker(&updateMtx);
+
 	update_backupFileList();
+
 	update_backupItemList();
+
 	update_autoSaveBtnStat();
+}
+
+void BKMWidget::switchBackupDispMode()
+{
+	int index = backupFileWidgets->currentIndex();
+	int count = backupFileWidgets->count();
+	backupFileWidgets->setCurrentIndex((index + 1) % count);
+	if (backupFileWidgets->currentWidget() == backupFileList) {
+		ui->branchModeBtn->setIcon(IconManager::icon("branch"));
+	}
+	else {
+		ui->branchModeBtn->setIcon(IconManager::icon("list"));
+	}
 }
 
 void BKMWidget::openSettings()
@@ -310,7 +334,7 @@ void BKMWidget::handleQSQL(Action action)
 			showMsg("失败：存档列表为空");
 			return;
 		}
-		int index = ui->backupFileList->currentRow();
+		int index = backupFileList->currentRow();
 		if (index == -1)index = 0;
 		if (index >= 0 && index <= backups.size() - 1) {
 			QString name = QString::fromStdWString(backups[index].first.filename().wstring());
@@ -390,7 +414,7 @@ void BKMWidget::initMenuBar()
 	connect(editMenu->addAction("Save"), &QAction::triggered, [this] {handleQSQL(Action::S); });
 	connect(editMenu->addAction("Load"), &QAction::triggered, [this] {handleQSQL(Action::L); });
 	connect(editMenu->addAction("Delete"), &QAction::triggered, [this] {
-		int index = ui->backupFileList->currentRow();
+		int index = backupFileList->currentRow();
 		auto backupFiles = bkManager.getAllBackups();
 		if (VectorTool::isValid(backupFiles, index)) {
 			bkManager.deleteBackup(index);
@@ -400,7 +424,7 @@ void BKMWidget::initMenuBar()
 		}
 	});
 	connect(editMenu->addAction("Copy"), &QAction::triggered, [this] {
-		auto index = ui->backupFileList->currentRow();
+		auto index = backupFileList->currentRow();
 		auto backupFiles = bkManager.getAllBackups();
 		if (VectorTool::isValid(backupFiles, index)) {
 			bkManager.copyBackup(index);
@@ -466,9 +490,11 @@ void BKMWidget::initButtonIcon()
 	//ui->pauseButton->setIconSize(QSize(60, 60));
 	//ui->startButton->setIcon(QIcon("resources//greenarrow.png"));
 	//ui->pauseButton->setIconSize(QSize(60, 60));
-	ui->myPicture->setIcon(QIcon("resources//wha.png"));
+	ui->myPicture->setIcon(IconManager::icon("wha"));
 	ui->myPicture->setIconSize(QSize(121, 121));
 	ui->myPicture->setVisible(false);
+	ui->branchModeBtn->setIcon(IconManager::icon("branch"));
+	ui->branchModeBtn->setIconSize(ui->branchModeBtn->size());
 	/*
 	ui->moveBtn_down->setIcon(QIcon("resources//black_arrow2.png"));
 	ui->moveBtn_down->setIconSize(QSize(25, 25));
@@ -477,6 +503,25 @@ void BKMWidget::initButtonIcon()
 	*/
 	//ui->settingsBtn->setIcon(QIcon("resources//settings.png"));
 	//ui->settingsBtn->setIconSize(QSize(26, 26));
+}
+
+void BKMWidget::initBackupFileWidgets()
+{
+	if (backupFileWidgets) {
+		Logger::critical("backupFileWidgets is already initialized!");
+		return;
+	}
+	backupFileWidgets = new QStackedWidget(this);
+	backupFileWidgets->setGeometry(ui->backupFileFrame->geometry());
+	backupFileList = new QListWidget();
+	backupFileWidgets->addWidget(backupFileList);
+	//this->backupFileList = qobject_cast<QListWidget*>(ui->backupFileWidgets->widget(0));
+	//if (!backupFileList) {
+	//	QMessageBox::critical(nullptr, "this is ok!", "NOOOOOOOOOOOOOOOOOO");
+	//	abort();
+	//}
+	backupFileWidgets->addWidget(new QGraphicsView());
+	backupFileWidgets->setCurrentWidget(backupFileList);
 }
 
 void BKMWidget::update_backupItemList()
@@ -535,35 +580,36 @@ void BKMWidget::update_autoSaveBtnStat()
 	//ui->startButton->setEnabled(!isRunning);
 	//ui->pauseButton->setEnabled(isRunning);
 	if (isRunning) {
-		ui->autoSaveBtn->setIcon(QIcon("resources//redsquare.png"));
+		ui->autoSaveBtn->setIcon(IconManager::icon("redsquare"));
 	}
 	else {
-		ui->autoSaveBtn->setIcon(QIcon("resources//greenarrow.png"));
+		ui->autoSaveBtn->setIcon(IconManager::icon("greenarrow"));
 	}
 	ui->autoSaveBtn->setIconSize(ui->autoSaveBtn->size());
 }
 
 void BKMWidget::update_backupFileList()
 {
-	ui->backupFileList->blockSignals(true);
-	ui->backupFileList->clear();
+	backupFileList->blockSignals(true);
+	backupFileList->clear();
 	auto backups = bkManager.getAllBackups();
 	//int currentItem = bkManager.getConfigs().currentItem;
 	//QString name = QString::fromStdString(bkManager.getBackupItem(currentItem).name);
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
-			QListWidgetItem* item = new QListWidgetItem(ui->backupFileList);
+			QListWidgetItem* item = new QListWidgetItem(backupFileList);
 			std::string time = ConfigHelper::timeSinceModification(bk.first);
 			QWidget* listItemWidget = createAllbkListItem(bk.first);
 			item->setSizeHint(listItemWidget->sizeHint());
-			ui->backupFileList->setItemWidget(item, listItemWidget);
-			ui->backupFileList->addItem(item);
+			backupFileList->setItemWidget(item, listItemWidget);
+			backupFileList->addItem(item);
 		}
 	}
 	else {
-		QListWidgetItem* item = new QListWidgetItem("<空>", ui->backupFileList);
+		QListWidgetItem* item = new QListWidgetItem("<空>", backupFileList);
 	}
-	ui->backupFileList->blockSignals(false);
+	backupFileList->blockSignals(false);
+
 }
 
 bool BKMWidget::check_backupValid()

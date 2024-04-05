@@ -126,8 +126,8 @@ void CompressHandler::compress(const std::filesystem::path& sourcePath, const st
 		fs::create_directories(targetDir);
 	}
 
-	Logger::debug(StrHelper::toQString(sourcePath));
-	Logger::debug(StrHelper::toQString(targetDir));
+	//Logger::debug(StrHelper::toQString(sourcePath));
+	//Logger::debug(StrHelper::toQString(targetDir));
 
 
 	QProcess process;
@@ -155,7 +155,9 @@ void CompressHandler::compress(const std::filesystem::path& sourcePath, const st
 		QByteArray standardError = process.readAllStandardError();
 		QString errorString = QString::fromLocal8Bit(standardError);
 		Logger::warning(errorString);
-		return;
+	}
+	else {
+		Logger::debug("Compress success!");
 	}
 }
 
@@ -185,7 +187,7 @@ void CompressHandler::extract(const std::filesystem::path& archivePath, const st
 	if (!process.waitForFinished(-1)) {
 		auto error = process.readAllStandardError();
 		auto output = process.readAllStandardOutput();
-		Logger::info(QString::fromLocal8Bit(output));
+		Logger::debug(QString::fromLocal8Bit(output));
 		Logger::warning("Failed to extract: " + QString::fromLocal8Bit(error));
 		return;
 	}

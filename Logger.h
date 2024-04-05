@@ -3,6 +3,7 @@
 #include <mutex>
 #include <qstring.h>
 #include <qmutex.h>
+#include <qtextstream.h>
 
 
 class Logger :public QObject
@@ -10,14 +11,13 @@ class Logger :public QObject
 	Q_OBJECT
 
 public:
-	enum LogType {
-		DEBUG,
-		INFO,
+	enum MsgType {
+		ERR,
+		FATAL,
 		LOG,
-		FATAL,				//will call abort()
-		CRITICAL,
 		WARNING,
-		ERR					//will throw std::runtime_error
+		CRITICAL,
+		DEBUG
 	};
 
 	static bool debugMode;
@@ -38,16 +38,15 @@ public:
 	void installGlobalLogger();
 	void update(bool stat);
 
-	static void log(const QString& msg, LogType type = LOG);
-	static void log(const std::wstring& msg, LogType type = LOG) { log(QString::fromStdWString(msg), type); }
-	static void log(const std::string& msg, LogType type = LOG) { log(QString::fromStdString(msg), type); }
-	static void log(const char* msg, LogType type = LOG) { log(QString(msg), type); }
+	static void log(const QString& msg, MsgType type = MsgType::LOG);
+	static void log(const std::wstring& msg, MsgType type = MsgType::LOG) { log(QString::fromStdWString(msg), type); }
+	static void log(const std::string& msg, MsgType type = MsgType::LOG) { log(QString::fromStdString(msg), type); }
+	static void log(const char* msg, MsgType type = MsgType::LOG) { log(QString(msg), type); }
 	static void debug(const QString& msg);
 	static void warning(const QString& msg);
 	static void err(const QString& msg);
 	static void err(const std::exception& e);
 	static void fatal(const QString& msg);
-	static void info(const QString& msg);
 	static void critical(const QString& msg);
 	
 	static bool checkErrorCode(const QString& msg);		//check chinese, ascii, japanese

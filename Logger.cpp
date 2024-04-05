@@ -79,11 +79,6 @@ void Logger::fatal(const QString& msg)
 	Logger::log(msg, Logger::FATAL);
 }
 
-void Logger::info(const QString& msg)
-{
-	Logger::log(msg, Logger::INFO);
-}
-
 void Logger::critical(const QString& msg)
 {
 	Logger::log(msg, Logger::CRITICAL);
@@ -109,33 +104,32 @@ void Logger::installGlobalLogger()
 	qInstallMessageHandler(Logger::customLogger);
 }
 
-void Logger::log(const QString& msg, LogType type)
+void Logger::log(const QString& msg, MsgType type)
 {
 	switch (type) {
-		case LogType::LOG:
+		case MsgType::LOG:
 			Logger::instance().append(msg);
 			break;
-		case LogType::DEBUG:
+		case MsgType::DEBUG:
 			if (Logger::debugMode)Logger::instance().append("Debug: " + msg);
 			break;
-		case LogType::CRITICAL:
+		case MsgType::CRITICAL:
 			Logger::instance().append("Critical: " + msg);
+			QMessageBox::critical(nullptr, "Critical", msg);
 			break;
-		case LogType::INFO:
-			Logger::instance().append("Info: " + msg);
-			break;
-		case LogType::WARNING:
+		case MsgType::WARNING:
 			Logger::instance().append("Warning: " + msg);
 			break;
-		case LogType::FATAL:
+		case MsgType::FATAL:
 			Logger::instance().append("FATAL: " + msg);
 			FileLogger::log("FATAL: " + msg);
+			QMessageBox::critical(nullptr, "FATAL", msg);
 			std::abort();			//program abort
 			break;
-		case LogType::ERR:
+		case MsgType::ERR:
 			Logger::instance().append("ERROR: " + msg);
 			FileLogger::log("ERROR: " + msg);
-			//throw std::runtime_error(msg.toStdString());
+			throw std::runtime_error(msg.toStdString());
 			break;
 		default:
 			Logger::instance().append("Unkown: " + msg);

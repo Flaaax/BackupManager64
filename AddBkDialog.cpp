@@ -52,7 +52,7 @@ BackupItem AddBkDialog::getUserInput() const
 
 void AddBkDialog::onClick_browseSourceButton()
 {
-	QString directory = QFileDialog::getExistingDirectory(this, tr("选择源文件路径"), "C:\\");
+	QString directory = QFileDialog::getExistingDirectory(this, tr("选择源文件夹"), "C:\\");
 	if (!directory.isEmpty()) {
 		ui->sourcePathEdit->setText(directory);
 		updateMessage();
@@ -61,7 +61,7 @@ void AddBkDialog::onClick_browseSourceButton()
 
 void AddBkDialog::onClick_browseBackupButton()
 {
-	QString directory = QFileDialog::getExistingDirectory(this, tr("选择存档路径"), "C:\\");		//QDir::homepath()
+	QString directory = QFileDialog::getExistingDirectory(this, tr("选择存档文件夹"), "C:\\");		//QDir::homepath()
 	if (!directory.isEmpty()) {
 		ui->backupPathEdit->setText(directory);
 		updateMessage();

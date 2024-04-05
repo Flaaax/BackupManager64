@@ -6,6 +6,7 @@
 #include <QPropertyAnimation>
 #include <QtWidgets/QWidget>
 #include <qmutex>
+#include <qstackedwidget.h>
 
 //todo 优化右键菜单，添加属性栏目
 //todo 在存档列表加入更多存档信息（如显示存档数量）
@@ -28,7 +29,6 @@ public:
 	~BKMWidget() { bkManager.saveConfigs();}					//dont need to delete ui
 
 private slots:
-
 	void addNewBackupItem();
 	void saveConfigs();
 	void handeAutoSave();								//start and pause button
@@ -38,17 +38,22 @@ private slots:
 	void callMenu_backupItemList(const QPoint& pos);
 	void callMenu_backupFileList(const QPoint& pos);
 	void refresh();
+	void switchBackupDispMode();
 
 private:
 	static constexpr auto MIN_CLICK_DUR = 1000;
 
 	Ui::BKMWidgetClass* ui = new Ui::BKMWidgetClass;
 
+	QStackedWidget* backupFileWidgets = nullptr;
+	QListWidget* backupFileList = nullptr;
+
 	BackupManagerQt bkManager;								//包含构造函数
 
 	void initMenuBar();
 	void initLogger();
 	void initButtonIcon();
+	void initBackupFileWidgets();
 	void showMsg(const QString& message);
 	void update_autoSaveBtnStat();
 	void update_backupItemList();

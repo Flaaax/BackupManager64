@@ -112,19 +112,6 @@
     <string extracomment="quick rollback">QL</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="backupFileList">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>210</y>
-     <width>291</width>
-     <height>191</height>
-    </rect>
-   </property>
-   <property name="defaultDropAction">
-    <enum>Qt::CopyAction</enum>
-   </property>
-  </widget>
   <widget class="QPushButton" name="myPicture">
    <property name="geometry">
     <rect>
@@ -196,6 +183,47 @@
      <width>331</width>
      <height>141</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="branchModeBtn">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>330</y>
+     <width>60</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>启用自动保存</string>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
+   </property>
+   <property name="text">
+    <string extracomment="start autobackup"/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>60</width>
+     <height>60</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QFrame" name="backupFileFrame">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>210</y>
+     <width>291</width>
+     <height>191</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
   </widget>
  </widget>
