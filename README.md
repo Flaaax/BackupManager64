@@ -19,7 +19,7 @@
 - [x] 加入压缩功能。
 - [ ] 加入中/英语言切换支持。
 
-## 资源链接
+## 资源
 <a target="_blank" href="https://icons8.com/icon/774/list">List</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a><br>
 <a target="_blank" href="https://icons8.com/icon/33277/merge-git">Branch</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
 
