@@ -19,6 +19,10 @@
 - [x] 加入压缩功能。
 - [ ] 加入中/英语言切换支持。
 
+## 资源链接
+<a target="_blank" href="https://icons8.com/icon/774/list">List</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+<a target="_blank" href="https://icons8.com/icon/33277/merge-git">Branch</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+
 ## 其它
 - 使用了7z.exe，来自https://7-zip.org/
-- 使用了Qt5框架
+- 使用Qt5框架
