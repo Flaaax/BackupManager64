@@ -26,6 +26,9 @@
     <Filter Include="Binary Files">
       <UniqueIdentifier>{e86cf81e-74b8-4320-b96e-bc24062d766f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TreeView">
+      <UniqueIdentifier>{0e9cd7c0-fc2a-48e6-853d-007792b33fed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="BackupManagerQt64.qrc">
@@ -80,13 +83,7 @@
     <ClInclude Include="StdStrTool.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="BackupManager\BackupConfig.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadPool.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="BackupManager\BackupProcess.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
     <ClInclude Include="VectorTool.h">
@@ -100,6 +97,15 @@
     </ClInclude>
     <ClInclude Include="IconManager.h">
       <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupManager\BackupConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupManager\BackupProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BkTree.h">
+      <Filter>Header Files\TreeView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +123,9 @@
     </QtMoc>
     <QtMoc Include="SettingsDialog.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="BkTreeView.h">
+      <Filter>Header Files\TreeView</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

@@ -83,6 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Logger.h" />
+    <ClInclude Include="BkTree.h" />
+    <QtMoc Include="BkTreeView.h" />
     <ClInclude Include="CompressHandler.h" />
     <ClInclude Include="IconManager.h" />
     <ClInclude Include="QWidgetTool.h" />

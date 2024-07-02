@@ -5,11 +5,10 @@
 #include<ui_SaveDialog.h>
 
 
-class SaveDialog:public QDialog
-{
+class SaveDialog :public QDialog {
 	Q_OBJECT
 public:
-	SaveDialog(QWidget* parent = NULL);
+	SaveDialog(QWidget* parent = NULL, const QString& defaultText = "");
 	std::wstring getUserInput();
 
 private slots:

@@ -53,7 +53,7 @@ private:
 	void initMenuBar();
 	void initLogger();
 	void initButtonIcon();
-	void initBackupFileWidgets();
+	void initBackupFileStackedWidget();
 	void showMsg(const QString& message);
 	void update_autoSaveBtnStat();
 	void update_backupItemList();
