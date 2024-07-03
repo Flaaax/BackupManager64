@@ -34,5 +34,6 @@ public:
 	{
 		return QString::fromStdWString(str.wstring());
 	}
+
 };
 

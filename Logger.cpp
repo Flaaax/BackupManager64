@@ -8,7 +8,7 @@ bool Logger::debugMode = true;
 
 void Logger::append(const QString& msg)
 {
-	emit messageRequest(QString::fromStdWString(ConfigHelper::getCurTimeForLogger() + L"> ") + msg);
+	emit messageRequest(QString::fromStdWString(ConfigHelper::getTimeStringForLogger() + L"> ") + msg);
 }
 
 void Logger::append(const std::wstring& msg)

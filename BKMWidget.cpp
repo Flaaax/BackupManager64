@@ -22,33 +22,10 @@
 #include "IconManager.h"
 #include "BkTreeView.h"
 #include <qscrollbar.h>
-
+#include "BackupFileListItem.h"
+#include "BackupFIleList.h"
 
 namespace fs = std::filesystem;
-
-static QWidget* createBackupFileListItem(const std::filesystem::path& filepath) {
-	QWidget* widget = new QWidget();
-	QHBoxLayout* layout = new QHBoxLayout(widget);
-	static const QFont font("微软雅黑");
-	//QString leftText = QString::fromStdWString(ConfigHelper::getBackupName(filepath));
-	QString leftText = QString::fromStdWString(filepath.filename().wstring());
-	QString rightText = QString::fromStdString(ConfigHelper::timeSinceModification(filepath));
-	QLabel* leftLabel = new QLabel(leftText);
-	QLabel* rightLabel = new QLabel(rightText);
-	leftLabel->setFont(font);
-	rightLabel->setFont(font);
-	rightLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	layout->addWidget(leftLabel);
-	layout->addWidget(rightLabel);
-	layout->setSpacing(0);
-	// 确保右侧的标签可以拉伸以填充可用空间
-	layout->setStretch(1, 1);
-	layout->setContentsMargins(3, 3, 3, 3); // 设置较小的边距
-	//layout->setSpacing(3); // 设置较小的控件间距
-	widget->setLayout(layout);
-
-	return widget;
-}
 
 BKMWidget::BKMWidget(QWidget* parent) : QWidget(parent) {
 	ui->setupUi(this);
@@ -230,12 +207,7 @@ void BKMWidget::callMenu_backupFileList(const QPoint& pos) {
 			bkManager.deleteBackup(index);
 		}
 		else if (selectedAction == renameAction) {
-			SaveDialog dialog(this, QString::fromStdWString(backupFiles[index].name));
-			auto ret = dialog.exec();
-			if (ret == QDialog::Accepted) {
-				auto saveName = dialog.getUserInput();
-				bkManager.renameBackup(index, saveName);
-			}
+			callDialog_renameBackup(backupFiles[index]);
 		}
 		else if (selectedAction == browseAction) {
 			const auto* item = VectorTool::safeGet(backupFiles, index);
@@ -250,11 +222,8 @@ void BKMWidget::callMenu_backupFileList(const QPoint& pos) {
 void BKMWidget::refresh() {
 	static QMutex updateMtx;
 	QMutexLocker locker(&updateMtx);
-
 	update_backupFileList();
-
 	update_backupItemList();
-
 	update_autoSaveBtnStat();
 }
 
@@ -280,7 +249,7 @@ void BKMWidget::openSettings() {
 	}
 }
 
-void BKMWidget::handleQSQL(Action action) {
+void BKMWidget::handleQSQL(Action action, bool actionHint) {
 	static qint64 lastClickTime = 0;
 	qint64 now = QDateTime::currentMSecsSinceEpoch();
 	if (now - lastClickTime < MIN_CLICK_DUR) {
@@ -290,7 +259,7 @@ void BKMWidget::handleQSQL(Action action) {
 	}
 	if (bkManager.getBackupItem(BackupManagerQt::CURRENT).empty()) {
 		QApplication::beep();
-		this->showMsg("未选中存档文件");
+		this->showMsg("未选中存档项目");
 		return;
 	}
 	if (action == Action::QS) {
@@ -336,15 +305,20 @@ void BKMWidget::handleQSQL(Action action) {
 		if (index >= 0 && index <= backups.size() - 1) {
 			QString name = QString::fromStdWString(backups[index].name);
 			QMessageBox msg(this);
-			//msg.setMinimumSize(200, 300);
-			msg.setWindowTitle("执行回档");
-			msg.setText("真的要回档\n" + name + "\n吗?");
-			msg.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-			int res = msg.exec();
-			if (res == QMessageBox::Ok) {
-				bkManager.rollBack(index);
+			if (actionHint) {
+				msg.setWindowTitle("执行回档");
+				msg.setText("真的要回档\n" + name + "\n吗?");
+				msg.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+				int res = msg.exec();
+				if (res == QMessageBox::Ok) {
+					bkManager.rollBack(index);
+					showMsg("已添加任务");
+				}
 			}
-			showMsg("已添加任务");
+			else {
+				bkManager.rollBack(index);
+				showMsg("已添加任务");
+			}
 		}
 	}
 	else {
@@ -459,7 +433,7 @@ void BKMWidget::initMenuBar() {
 
 void BKMWidget::initLogger() {
 	ui->loggerEdit->setReadOnly(true);
-	ui->loggerEdit->setFont(QFont("Consolas", 8));
+	ui->loggerEdit->setFont(QFont("Consolas", 9));
 	connect(&Logger::instance(), &Logger::messageRequest, this, [this](const QString& msg) {
 		this->log(msg);
 		int lineCount = ui->loggerEdit->document()->lineCount();
@@ -506,7 +480,7 @@ void BKMWidget::initBackupFileStackedWidget() {
 	}
 	backupFileWidgets = new QStackedWidget(this);
 	backupFileWidgets->setGeometry(ui->backupFileFrame->geometry());
-	backupFileList = new QListWidget();
+	backupFileList = new BackupFileList();
 	backupFileWidgets->addWidget(backupFileList);
 	//this->backupFileList = qobject_cast<QListWidget*>(ui->backupFileWidgets->widget(0));
 	//if (!backupFileList) {
@@ -588,9 +562,10 @@ void BKMWidget::update_backupFileList() {
 	if (!backups.empty()) {
 		for (const auto& bk : backups) {
 			QListWidgetItem* item = new QListWidgetItem(backupFileList);
-			std::string time = ConfigHelper::timeSinceModification(bk.path);
-			QWidget* listItemWidget = createBackupFileListItem(bk.path);
-			item->setSizeHint(listItemWidget->sizeHint());
+			auto listItemWidget = new BackupFileListItemWidget(backupFileList, bk);
+			connect(listItemWidget, &BackupFileListItemWidget::buttonClicked, this, &BKMWidget::onBackupFileListBtnClk);
+			int fixedHeight = 25;
+			item->setSizeHint(QSize(listItemWidget->sizeHint().width(), fixedHeight));
 			backupFileList->setItemWidget(item, listItemWidget);
 			backupFileList->addItem(item);
 		}
@@ -618,6 +593,42 @@ bool BKMWidget::check_backupValid() {
 
 void BKMWidget::log(const QString& msg) {
 	this->ui->loggerEdit->appendPlainText(msg);
+}
+
+BackupFile BKMWidget::getCurrentBackupFile() {
+	int index = backupFileList->currentRow();
+	auto backups = bkManager.getAllBackups();
+	if (index >= 0 && index <= backups.size() - 1) {
+		return backups[index];
+	}
+	return BackupFile();
+}
+
+void BKMWidget::onBackupFileListBtnClk(int buttonId) {
+	auto file = getCurrentBackupFile();
+	if (file.isEmpty())return;
+	switch (buttonId) {
+		case 0:
+			handleQSQL(Action::L, false);
+			break;
+		case 1:
+			callDialog_renameBackup(file);
+			break;
+		case 2:
+			bkManager.deleteBackup(file.index);
+			break;
+		default:
+			break;
+	}
+}
+
+void BKMWidget::callDialog_renameBackup(const BackupFile& file) {
+	SaveDialog dialog(this, QString::fromStdWString(file.name));
+	auto ret = dialog.exec();
+	if (ret == QDialog::Accepted) {
+		auto saveName = dialog.getUserInput();
+		bkManager.renameBackup(file.index, saveName);
+	}
 }
 
 void BKMWidget::callBackupItemDeleteDialog(QListWidgetItem* item) {

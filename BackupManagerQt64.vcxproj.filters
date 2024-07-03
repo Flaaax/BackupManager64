@@ -29,6 +29,18 @@
     <Filter Include="Header Files\TreeView">
       <UniqueIdentifier>{0e9cd7c0-fc2a-48e6-853d-007792b33fed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Widgets">
+      <UniqueIdentifier>{e278c04f-ff26-4bfc-a42b-e1c6dacc1669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{444560df-278f-4568-b38b-552a5277711d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backup">
+      <UniqueIdentifier>{6d0ce779-642c-4d47-9df6-fc8203d95517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backup">
+      <UniqueIdentifier>{56015da1-a6f9-4764-8204-b3c72ed0f563}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="BackupManagerQt64.qrc">
@@ -42,44 +54,41 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BackupManager\BackupManagerQt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BKMWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SettingsDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AddBkDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SaveDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="BackupManager\BackupConfig.cpp">
-      <Filter>Source Files\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="AddBkDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="BackupManager\BackupManagerQt.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="BKMWidget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsDialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="BackupManager\BackupConfig.cpp">
+      <Filter>Source Files\Backup</Filter>
+    </ClCompile>
     <ClCompile Include="BackupManager\BackupProcess.cpp">
-      <Filter>Source Files\Utils</Filter>
+      <Filter>Source Files\Backup</Filter>
     </ClCompile>
     <ClCompile Include="CompressHandler.cpp">
-      <Filter>Source Files\Utils</Filter>
+      <Filter>Source Files\Backup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BackupManager\BackupManagerQt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StdStrTool.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
@@ -92,40 +101,49 @@
     <ClInclude Include="QWidgetTool.h">
       <Filter>Header Files\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="CompressHandler.h">
-      <Filter>Header Files\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="IconManager.h">
       <Filter>Header Files\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="BackupManager\BackupConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BackupManager\BackupProcess.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BkTree.h">
       <Filter>Header Files\TreeView</Filter>
     </ClInclude>
+    <ClInclude Include="BackupManager\BackupConfig.h">
+      <Filter>Header Files\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupManager\BackupManagerQt.h">
+      <Filter>Header Files\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupManager\BackupProcess.h">
+      <Filter>Header Files\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="CompressHandler.h">
+      <Filter>Header Files\Backup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="BKMWidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="AddBkDialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="SaveDialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="Logger.h">
       <Filter>Header Files\Utils</Filter>
     </QtMoc>
-    <QtMoc Include="SettingsDialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="BkTreeView.h">
       <Filter>Header Files\TreeView</Filter>
+    </QtMoc>
+    <QtMoc Include="AddBkDialog.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="BKMWidget.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="SaveDialog.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="SettingsDialog.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="BackupFileListItem.h">
+      <Filter>Header Files\Widgets</Filter>
+    </QtMoc>
+    <QtMoc Include="BackupFileList.h">
+      <Filter>Header Files\Widgets</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

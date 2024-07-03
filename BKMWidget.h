@@ -31,14 +31,18 @@ public:
 private slots:
 	void addNewBackupItem();
 	void saveConfigs();
-	void handeAutoSave();								//start and pause button
+	void handeAutoSave();										//start and pause button
 	void openSettings();
-	void handleQSQL(Action action);
-	void onItemChange_bkNameList(QListWidgetItem* item);	//更新namelist和currentBackup
+	void handleQSQL(Action action,bool actionHint=true);
+	void onItemChange_bkNameList(QListWidgetItem* item);		//更新namelist和currentBackup
 	void callMenu_backupItemList(const QPoint& pos);
 	void callMenu_backupFileList(const QPoint& pos);
 	void refresh();
 	void switchBackupDispMode();
+
+	//sub widgets
+	void onBackupFileListBtnClk(int buttonId);
+	void callDialog_renameBackup(const BackupFile& file);
 
 private:
 	static constexpr auto MIN_CLICK_DUR = 1000;
@@ -61,6 +65,9 @@ private:
 	void callBackupItemDeleteDialog(QListWidgetItem* item);
 	bool check_backupValid();
 	void log(const QString& msg);
+
+	//util
+	BackupFile getCurrentBackupFile();
 };
 
 
